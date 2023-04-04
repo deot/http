@@ -1,0 +1,56 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "description": "custom http client",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "init": "npm install && npm run bootstrap && npm run link",
+    "bootstrap": "lerna clean --yes && lerna bootstrap --loglevel silly",
+    "pub": "npm run build && lerna publish",
+    "pub:no-tag": "npm run pub -- --no-git-tag-version",
+    "lint": "esw packages --ext .js,.ts,.jsx,.tsx,.md --color",
+    "lint:fix": "npm run lint -- --fix",
+    "lint:watch": "npm run lint -- --watch --fix",
+    "link": "ddc link",
+    "dev": "ddc dev",
+    "build": "ddc build",
+    "test": "ddc test",
+    "add": "ddc add"
+  },
+  "scripts-info": {
+    "init": "首次安装",
+    "link": "依赖包关联",
+    "add": "创建新包或者给包添加依赖",
+    "dev": "开发模式",
+    "build": "打包模式",
+    "test": "执行测试, 可选择单个包或全部"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deot/http.git"
+  },
+  "author": "deot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/deot/http/issues"
+  },
+  "homepage": "https://github.com/deot/http#readme",
+  "devDependencies": {
+    "@deot/dev-cli": "^1.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "node ./node_modules/@deot/dev-cli/config/commit-lint"
+    }
+  },
+  "lint-staged": {
+    "{packages}/**/*.{js,ts,jsx,tsx,md}": [
+      "esw --ext '.js,.ts,.jsx,.tsx,.md' --fix",
+      "git add"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "extends": "@deot/dev-cli/config/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "paths": {
+      "@deot/http": ["packages/index/src"],
+      "@deot/http-*": ["packages/*/src"]
+    }
+  },
+  "include": [
+    "packages/shims.d.ts",
+    "packages/*/__tests__",
+    "packages/*/src"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "scripts/**/*"
+  ]
+}
