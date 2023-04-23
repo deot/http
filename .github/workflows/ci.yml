@@ -1,29 +1,39 @@
 name: 'ci'
+
 on:
   push:
     branches:
       - '**'
   pull_request:
     branches:
-      - main
+      - main'
+  workflow_dispatch:
 
 permissions:
   contents: read # to fetch code (actions/checkout)
 
 jobs:
   unit-test:
+    # let's ignore release commits, otherwise it'll try to run twice
+    if: ${{ !startsWith(github.event.head_commit.message , 'chore(release):') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
 
       - name: Set node version to 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - run: npm run init
+      - run: pnpm install
 
       - name: Run unit tests
-        run: npm run test -- --packageName '**'
+        run: npm run test -- --package-name '**'
 

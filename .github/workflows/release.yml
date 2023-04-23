@@ -1,0 +1,110 @@
+name: Release Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      dryRun: 
+        description: 'Dry Run'
+        default: true
+        required: true
+        type: boolean
+
+      push: 
+        description: 'Allow Git Push'
+        default: true
+        required: true
+        type: boolean
+
+      publish: 
+        description: 'Allow Npm Publish'
+        default: true
+        required: true
+        type: boolean
+
+      tag: 
+        description: 'Allow Git Tag'
+        default: true
+        required: true
+        type: boolean
+
+      commit: 
+        description: 'Allow Git Commit'
+        default: true
+        required: true
+        type: boolean
+
+      version:
+        description: 'Update Version（major.minor.patch）'
+        default: 'patch'
+        required: false
+        type: choice
+        options: 
+          - major
+          - minor
+          - patch
+
+      forceUpdatePackage:
+        description: 'Force Update Package (input all -> **)'
+        default: ''
+        type: string
+
+      skipUpdatePackage:
+        description: 'Skip Update Package'
+        default: ''
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Set node version to 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Checkout main
+        run: git checkout main
+
+      - name: Sanity check
+        run: |
+          echo branch `git branch --show-current`;
+          echo node `node -v`;
+          echo node `pnpm -v`;
+
+      - name: Set git config
+        run: |
+          git config pull.rebase false
+          git config --global user.email "release-workflow@*.*"
+          git config --global user.name "Release Workflow"
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}
+
+      - name: Set npm config
+        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+
+      - name: Run init
+        run: npm run init
+
+      - name: Run release
+        run: >-
+          npm run release --
+          --${{ inputs.version }}
+          ${{ !inputs.dryRun  && '--no-dry-run' || '' }}
+          ${{ !inputs.push && '--no-push' || '' }}
+          ${{ !inputs.publish && '--no-publish' || '' }}
+          ${{ !inputs.tag && '--no-tag' || '' }}
+          ${{ !inputs.commit && '--no-commit' || '' }}
+          ${{ inputs.forceUpdatePackage && format('--force-update-package "{0}"', inputs.forceUpdatePackage) || ''}}
+          ${{ inputs.skipUpdatePackage && format('--skip-update-package "{0}"', inputs.skipUpdatePackage) || ''}}
+
+

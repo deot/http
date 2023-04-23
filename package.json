@@ -3,14 +3,10 @@
   "version": "1.0.0",
   "description": "custom http client",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "init": "npm install && npm run bootstrap && npm run link",
-    "bootstrap": "lerna clean --yes && lerna bootstrap --loglevel silly",
-    "pub": "npm run build && lerna publish",
-    "pub:no-tag": "npm run pub -- --no-git-tag-version",
+    "prepare": "husky install",
+    "init": "npx pnpm install",
+    "init:force": "rm -rf ./node_modules pnpm-lock.yaml ./packages/*/node_modules && npm run init",
     "lint": "esw packages --ext .js,.ts,.jsx,.tsx,.md --color",
     "lint:fix": "npm run lint -- --fix",
     "lint:watch": "npm run lint -- --watch --fix",
@@ -18,7 +14,8 @@
     "dev": "ddc dev",
     "build": "ddc build",
     "test": "ddc test",
-    "add": "ddc add"
+    "add": "ddc add",
+    "release": "ddc release"
   },
   "scripts-info": {
     "init": "首次安装",
@@ -39,18 +36,6 @@
   },
   "homepage": "https://github.com/deot/http#readme",
   "devDependencies": {
-    "@deot/dev-cli": "^1.0.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "node ./node_modules/@deot/dev-cli/config/commit-lint"
-    }
-  },
-  "lint-staged": {
-    "{packages}/**/*.{js,ts,jsx,tsx,md}": [
-      "esw --ext '.js,.ts,.jsx,.tsx,.md' --fix",
-      "git add"
-    ]
+    "@deot/dev-cli": "^1.0.7"
   }
 }

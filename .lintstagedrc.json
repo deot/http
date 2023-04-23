@@ -1,0 +1,5 @@
+{
+  "{packages,scripts}/**/*.{js,ts,jsx,tsx,md}": [
+    "esw --ext '.js,.ts,.jsx,.tsx,.md' --fix"
+  ]
+}
