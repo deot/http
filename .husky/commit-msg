@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-node ./node_modules/@deot/dev-cli/config/commit-lint --edit $1
+node ./node_modules/@deot/dev/commitlint --edit $1
