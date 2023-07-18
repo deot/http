@@ -14,6 +14,8 @@ importers:
 
   packages/client: {}
 
+  packages/core: {}
+
   packages/index:
     dependencies:
       '@deot/http-shared':
@@ -23,8 +25,6 @@ importers:
   packages/server: {}
 
   packages/shared: {}
-
-  packages/shell: {}
 
 packages:
 
