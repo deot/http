@@ -1,7 +1,10 @@
 /* eslint-disable lines-between-class-members */
 
 export interface HttpResponseOptions {
-	body?: BodyInit | null;
+	// Allow Extra KeyValue
+	[key: string]: any;
+
+	body?: Record<string, any> | BodyInit | null;
 	// From ResponseInit
 	headers?: HeadersInit;
 	status?: number;
@@ -11,30 +14,15 @@ export interface HttpResponseOptions {
 	redirected?: boolean;
 	type?: ResponseType;
 	ok?: boolean;
-	// Custom
-	extra?: Record<string, any>;
 }
 
-export const ERROR_CODE = {
-	HTTP_CODE_ILLEGAL: () => HttpResponse.error('HTTP_CODE_ILLEGAL'),
-	HTTP_URL_EMPTY: () => HttpResponse.error('HTTP_URL_EMPTY'),
-	HTTP_SEND_FAILED: () => HttpResponse.error('HTTP_SEND_FAILED'),
-	HTTP_TOKEN_EXPIRE: () => HttpResponse.error('HTTP_TOKEN_EXPIRE'),
-	HTTP_FORCE_DESTROY: () => HttpResponse.error('HTTP_FORCE_DESTROY'),
-	HTTP_RESPONSE_PARSING_FAILED: () => HttpResponse.error('HTTP_RESPONSE_PARSING_FAILED'),
-	HTTP_RESPONSE_REBUILD_FAILED: () => HttpResponse.error('HTTP_RESPONSE_REBUILD_FAILED'),
-	HTTP_OPTIONS_BUILD_FAILED: () => HttpResponse.error('HTTP_OPTIONS_BUILD_FAILED'),
-	HTTP_STATUS_ERROR: () => HttpResponse.error('HTTP_STATUS_ERROR'),
-	HTTP_CANCEL: () => HttpResponse.error('HTTP_CANCEL'),
-	HTTP_REQUEST_TIMEOUT: () => HttpResponse.error('HTTP_REQUEST_TIMEOUT'),
-	HTTP_CONTENT_EXCEEDED: () => HttpResponse.error('HTTP_CONTENT_EXCEEDED')
-};
-
 export class HttpResponse {
+	// Allow Extra KeyValue
+	[key: string]: any;
 
 	// From Response
 	url!: string;
-	body!: BodyInit | null;
+	body!: Record<string, any> | BodyInit | null; // ReadableStream | Blob | BufferSource | FormData | URLSearchParams | string
 	headers!: HeadersInit;
 	status!: number;
 	statusText!: string;
@@ -46,7 +34,7 @@ export class HttpResponse {
 	// Custom
 
 	constructor(
-		body: BodyInit | null | HttpResponse | HttpResponseOptions, 
+		body?: BodyInit | null | HttpResponse | HttpResponseOptions, 
 		options?: HttpResponseOptions
 	) {
 		const defaults = {
@@ -61,18 +49,22 @@ export class HttpResponse {
 			url: ''
 		};
 
-		Object.keys(defaults).forEach((key) => {
-			this[key] = typeof body?.[key] !== 'undefined' 
-				? body?.[key] 
-				: typeof options?.[key] !== 'undefined' 
-					? options?.[key]
-					: defaults[key];
+		const isBodyAsOptions = body && (body.constructor === Object || body instanceof HttpResponse);
+		const kv = isBodyAsOptions 
+			? { ...defaults, ...(body as (HttpResponse | HttpResponseOptions)), ...options } 
+			: { ...defaults, body, ...options };
+
+		Object.keys(kv).forEach((key) => {
+			this[key] = typeof kv[key] !== 'undefined' 
+				? kv[key] 
+				: defaults[key];
 		});
 	}
 
 	// From Response
-	static error(statusText?: string) {
+	static error(statusText?: string, options?: HttpResponseOptions) {
 		return new HttpResponse(null, {
+			...options,
 			type: 'error',
 			status: 0,
 			ok: false,

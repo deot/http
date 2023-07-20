@@ -2,6 +2,7 @@
 import type { HttpShell } from './shell';
 
 export interface HttpRequestOptions {
+	// Allow Extra KeyValue
 	[key: string]: any;
 
 	url?: string;
@@ -9,7 +10,7 @@ export interface HttpRequestOptions {
 	// From RequestInit
 	method?: string;
 	headers?: HeadersInit;
-	body?: BodyInit | null;
+	body?: Record<string, any> | BodyInit | null;
 	mode?: RequestMode;
 	credentials?: RequestCredentials;
 	cache?: RequestCache;
@@ -27,17 +28,18 @@ export interface HttpRequestOptions {
 	onBefore?: HttpHook | HttpHook[];
 	onAfter?: HttpHook | HttpHook[];
 	timeout?: number;
-	extra?: Record<string, any>;
 }
 
 export type HttpHook<T = any> = (shell: HttpShell) => T;
 export class HttpRequest {
+	// Allow Extra KeyValue
+	[key: string]: any;
 
 	// From Request
-	url: string;
+	url!: string;
 	method!: string;
 	headers!: HeadersInit;
-	body!: BodyInit | null;
+	body!: Record<string, any> | BodyInit | null;
 	mode!: RequestMode;
 	credentials!: RequestCredentials;
 	cache!: RequestCache;
@@ -57,17 +59,12 @@ export class HttpRequest {
 	onBefore!: HttpHook[];
 	onAfter!: HttpHook[];
 	timeout!: number;
-	extra: Record<string, any> = {};
 
 	constructor(
 		url: string | HttpRequest | HttpRequestOptions, 
 		options?: HttpRequestOptions,
 		parent?: HttpRequest
 	) {
-		const it = (url && typeof url === 'object' ? url : options) || {};
-
-		this.url = it.url || (typeof url === 'string' ? url : '');
-
 		const defaults = {
 			// From Request
 			method: 'GET',
@@ -86,26 +83,26 @@ export class HttpRequest {
 			localData: null,
 			timeout: 60000
 		};
+		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HttpRequest);
+		const kv = isUrlAsOptions 
+			? { ...defaults, ...parent, ...(url as (HttpRequest | HttpRequestOptions)), ...options } 
+			: { ...defaults, ...parent, url, ...options };
 
-		Object.keys(defaults).forEach((key) => {
-			this[key] = typeof it[key] !== 'undefined' 
-				? it[key] 
-				: typeof parent?.[key] !== 'undefined' 
-					? parent?.[key]
-					: defaults[key];
+		Object.keys(kv).forEach((key) => {
+			this[key] = typeof kv[key] !== 'undefined' 
+				? kv[key]
+				: defaults[key];
 		});
 
-		this.extra = {
-			...parent?.extra,
-			...it?.extra
-		};
-
-		const hooks = ['onLoading', 'onLoading', 'onBefore', 'onAfter'] as const;
-
+		// Merge Hooks & Filter Same
+		const it = (url && typeof url === 'object' ? url : options) || {};
+		const hooks = ['onLoading', 'onLoaded', 'onBefore', 'onAfter'] as const;
 		hooks.forEach((key) => {
 			const fn = it[key];
 			const current = Array.isArray(fn) ? fn : fn ? [fn] : [];
-			this[key] = parent ? parent[key].concat(current) : current;
+			this[key] = (parent ? parent[key].concat(current) : current).filter((v, i, source) => {
+				return source.indexOf(v) === i;
+			});
 		});
 	}
 
