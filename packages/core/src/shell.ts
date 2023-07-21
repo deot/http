@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 /* eslint-disable no-dupe-class-members */
 /* eslint-disable lines-between-class-members */
 import type { HttpController } from "./controller";
@@ -8,15 +9,15 @@ import { ERROR_CODE } from './error';
 import { getUid } from './utils';
 import type { HttpRequestOptions, HttpHook } from "./request";
 
-interface HttpShellLeaf {
+export interface HttpShellLeaf {
 	id: string;
 	cancel?: () => void; 
 	timeout?: any;
 	request?: HttpRequest;
-	originalRequest?: HttpRequest;
+	originalRequest: HttpRequest;
 	response?: HttpResponse;
 	originalResponse?: HttpResponse;
-	target?: Promise<HttpResponse>;
+	target: Promise<HttpResponse>;
 }
 export class HttpShell {
 	parent: HttpController;
@@ -34,11 +35,11 @@ export class HttpShell {
 		this.parent = parent;
 	}
 
-	async task(fns: HttpHook[]) {
+	async task(leaf: HttpShellLeaf, fns: HttpHook[]) {
 		return fns.reduceRight((pre, fn) => {
-			pre = pre.then(() => fn(this));
+			pre = pre.then(() => fn(leaf));
 			return pre;
-		}, Promise.resolve(this));
+		}, Promise.resolve(leaf));
 	}
 
 	send(returnLeaf: true): HttpShellLeaf;
@@ -47,49 +48,63 @@ export class HttpShell {
 		this.parent._add(this);
 
 		const id = getUid(`shell.leaf`);
-		const leaf: HttpShellLeaf = { id, originalRequest: this.request };
+		const leaf = { id, originalRequest: this.request } as HttpShellLeaf;
 		this.leafs[id] = leaf;
 
 		const cancel = new Promise((_, reject) => {
-			leaf.cancel = () => reject(this.error(id, ERROR_CODE.HTTP_CANCEL));
+			leaf.cancel = () => reject(this.error(leaf, ERROR_CODE.HTTP_CANCEL));
 		});
 
 		let error: HttpResponse;
 		let response: HttpResponse;
-		const target = Promise.resolve()
-			.then(() => this.loading())
-			.then(() => this.before(id))
-			.then(() => {
-				const ajax = this.after(id);
-				
-				const timeout = new Promise((_, reject) => {
-					leaf.timeout = setTimeout(() => reject(this.error(id, ERROR_CODE.HTTP_REQUEST_TIMEOUT)), this.request.timeout);
+		const target = new Promise<HttpResponse>((resolve, reject) => {
+			Promise.resolve()
+				.then(() => this.loading(leaf))
+				.then(() => this.before(leaf))
+				.then(() => {
+					const ajax = this.after(leaf);
+					const { timeout } = leaf.originalRequest;
+					const races = [ajax, cancel];
+					if (timeout) {
+						races.push(
+							new Promise((_, reject$) => {
+								leaf.timeout = setTimeout(() => reject$(this.error(leaf, ERROR_CODE.HTTP_REQUEST_TIMEOUT)), timeout);
+							})
+						);
+					}
+					return Promise.race(races);
+				})
+				.then(() => (response = (leaf.response as HttpResponse)))
+				.catch(e => (error = e))
+				.then(() => this.clear(leaf))
+				.then(() => {
+					const isError = error || response.type === 'error';
+					// maxTries
+					const request = new HttpRequest(this.request);
+					request.maxTries -= 1;
+					if (isError && request.maxTries >= 1) {
+						return Promise.resolve()
+							.then(() => request.interval && new Promise(_ => setTimeout(_, request.interval)))
+							.then(() => this.parent.http(request))
+							.then(resolve)
+							.catch(reject);
+					}
+					
+					return isError ? reject(error || response) : resolve(response);
 				});
-
-				return Promise.race([ajax, cancel].concat(this.request.timeout ? [timeout] : []));
-			})
-			.then(() => (response = (leaf.response as HttpResponse)))
-			.catch(e => (error = e))
-			.then(() => this.clear(id))
-			.then(() => {
-				return error 
-					? Promise.reject(error) 
-					: response;
-			});
+		});
 
 		leaf.target = target;
 
-		typeof value === 'function' 
-			&& value(leaf);
-
+		typeof value === 'function' && value(leaf);
 		return typeof value !== 'function' && value
 			? leaf 
 			: target;
 	}
 
-	async cancel(id?: string) {
+	async cancel(id?: string | HttpShellLeaf) {
 		if (id) {
-			const leaf = this.leafs[id];
+			const leaf = typeof id === 'string' ? this.leafs[id] : id;
 			if (leaf?.cancel && leaf?.target) {
 				leaf.cancel();
 				await new Promise<void>(resolve => { 
@@ -104,12 +119,15 @@ export class HttpShell {
 		}
 	}
 
-	async clear(id: string) {
-		const { timeout } = this.leafs[id];
+	async clear(leaf: HttpShellLeaf) {
+		const { timeout, id } = leaf;
 		timeout && clearTimeout(timeout);
 
+		await this.loaded(leaf);
+
+		// clear keyValue
+		Object.keys(leaf).forEach(key => delete leaf[key]);
 		delete this.leafs[id];
-		await this.loaded();
 
 		// 当都已经完成时，通知父层移除以减少
 		if (!Object.keys(this.leafs).length) {
@@ -117,90 +135,94 @@ export class HttpShell {
 		}
 	}
 
-	async loading() {
-		const { localData, onLoading } = this.request;
+	async loading(leaf: HttpShellLeaf) {
+		const { localData, onLoading } = leaf.originalRequest;
 
 		if (!localData) {
-			await this.task(onLoading);
+			await this.task(leaf, onLoading);
 		}
 	}
 
-	async loaded() {
-		const { localData, onLoaded } = this.request;
+	async loaded(leaf: HttpShellLeaf) {
+		const { localData, onLoaded } = leaf.originalRequest;
 
 		if (!localData) {
-			await this.task(onLoaded);
+			await this.task(leaf, onLoaded);
 		}
 	}
 
-	async before(id: string) {
+	async before(leaf: HttpShellLeaf) {
 		const { apis } = this.parent;
-		const { onBefore } = this.request;
+		const { onBefore } = leaf.originalRequest;
 
 		let result: any;
 		try {			
-			result = (await this.task(onBefore));
+			result = (await this.task(leaf, onBefore));
 		} catch (e) {
-			throw this.error(id, ERROR_CODE.HTTP_OPTIONS_BUILD_FAILED);
+			throw this.error(leaf, ERROR_CODE.HTTP_OPTIONS_REBUILD_FAILED, e);
 		}
 
 		let request: HttpRequest;
 		if (result instanceof HttpRequest) {
 			request = new HttpRequest(result);
+		} else if (result === leaf) {
+			request = leaf.request || new HttpRequest(leaf.originalRequest);
 		} else {
-			request = new HttpRequest(this.request);
+			request = new HttpRequest(leaf.originalRequest!, result);
 		}
 
-		if (!/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
+		if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
 			let combo = request.url.split('?'); // 避免before带上?token=*之类
 			request.url = `${apis[combo[0]] || ''}${combo[1] ? `?${combo[1]}` : ''}`;
 		}
-
-		this.leafs[id].request = request;
+		leaf.request = request;
 
 		if (!request.url && !request.localData) {
-			throw this.error(id, ERROR_CODE.HTTP_URL_EMPTY);
+			throw this.error(leaf, ERROR_CODE.HTTP_URL_EMPTY);
 		}
 	}
 
-	async after(id: string) {
-		const request = this.leafs[id].request as HttpRequest;
-		const { localData, onAfter } = request;
+	async after(leaf: HttpShellLeaf) {
+		const { localData, onAfter } = leaf.request as HttpRequest;
+		
 		let target = localData 
 			? Promise.resolve(new HttpResponse({ body: localData })) 
-			: this.parent.provider(request);
+			: this.parent.provider(leaf.request!);
 		
 		let response: HttpResponse = await target;
 
-		this.leafs[id].originalResponse = response;
+		leaf.originalResponse = response;
 
 		let result: any;
 		try {
-			result = (await this.task(onAfter));
+			result = (await this.task(leaf, onAfter));
 		} catch (e) {
-			throw this.error(id, ERROR_CODE.HTTP_OPTIONS_BUILD_FAILED);
+			throw this.error(leaf, ERROR_CODE.HTTP_RESPONSE_REBUILD_FAILED, e);
 		}
 
 		if (result instanceof HttpResponse) {
 			response = new HttpResponse(result);
+		} else if (result === leaf) {
+			response = leaf.response || new HttpResponse(leaf.originalResponse);
 		} else {
-			response = new HttpResponse(this.leafs[id].originalResponse);
+			response = new HttpResponse(leaf.originalResponse, result);
 		}
 
-		this.leafs[id].response = response;
+		leaf.response = response;
 	}
 
-	error(id: string, statusText?: string) {
+	error(leaf: HttpShellLeaf, statusText: string, body?: any) {
 		return HttpResponse.error(statusText, {
+			body,
 			[`@@internal`]: {
 				request: {
 					input: this.request,
-					used: this.leafs[id]?.request
+					used: leaf?.request
 				},
 
 				response: {
-					input: this.leafs[id]?.originalResponse,
-					used: this.leafs[id]?.response
+					input: leaf?.originalResponse,
+					used: leaf?.response
 				}
 			}
 		});

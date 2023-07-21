@@ -71,12 +71,12 @@ export class HttpResponse {
 			statusText
 		});
 	}
-	static json() {}
-	static redirected() {}
-	arrayBuffer() {}
-	blob() {}
-	clone() {}
-	formData() {}
-	json() {}
-	text() {}
+	// static json() {}
+	// static redirected() {}
+	// arrayBuffer() {}
+	// blob() {}
+	// clone() {}
+	// formData() {}
+	// json() {}
+	// text() {}
 }

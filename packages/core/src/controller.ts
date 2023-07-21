@@ -4,8 +4,9 @@ import type { HttpResponse } from "./response";
 import { HttpRequest } from "./request";
 
 import { HttpShell } from "./shell";
+import type { HttpShellLeaf } from "./shell";
 
-type HttpControllerOptions = HttpRequestOptions & {
+export type HttpControllerOptions = HttpRequestOptions & {
 	provider: HttpProvider;
 	apis?: Record<string, string>;
 }
@@ -21,10 +22,10 @@ export class HttpController {
 
 	constructor(options: HttpControllerOptions) {
 		if (!options?.provider) {
-			throw new Error('TODO');
+			throw new Error('[@deot/http-core]: provider is required.');
 		}
 
-		const { provider, apis = {}, ...globalOptions } = options || {};
+		const { provider, apis = {}, ...globalOptions } = options;
 		
 		this.provider = provider;
 		this.apis = apis;
@@ -51,13 +52,13 @@ export class HttpController {
 		return shell;
 	}
 
-	async cancel(uid?: string) {
+	async cancel(id?: string | HttpShellLeaf) {
 		await this.shells.reduce((pre, shell) => {
-			pre = pre.then(() => shell.cancel(uid));
+			pre = pre.then(() => shell.cancel(id));
 			return pre;
 		}, Promise.resolve());
 
-		if (!uid) {
+		if (!id) {
 			this.shells = [];
 		}
 	}

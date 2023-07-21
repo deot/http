@@ -1,5 +1,5 @@
 /* eslint-disable lines-between-class-members */
-import type { HttpShell } from './shell';
+import type { HttpShellLeaf } from './shell';
 
 export interface HttpRequestOptions {
 	// Allow Extra KeyValue
@@ -28,9 +28,12 @@ export interface HttpRequestOptions {
 	onBefore?: HttpHook | HttpHook[];
 	onAfter?: HttpHook | HttpHook[];
 	timeout?: number;
+	maxTries?: number;
+	// 仅当maxTries > 1 是有效, 可配合做轮询请求
+	interval?: number;
 }
 
-export type HttpHook<T = any> = (shell: HttpShell) => T;
+export type HttpHook<T = any> = (leaf: HttpShellLeaf) => T;
 export class HttpRequest {
 	// Allow Extra KeyValue
 	[key: string]: any;
@@ -59,6 +62,8 @@ export class HttpRequest {
 	onBefore!: HttpHook[];
 	onAfter!: HttpHook[];
 	timeout!: number;
+	maxTries!: number;
+	interval!: number;
 
 	constructor(
 		url: string | HttpRequest | HttpRequestOptions, 
@@ -81,7 +86,9 @@ export class HttpRequest {
 			signal: new AbortController().signal,
 			// Custom
 			localData: null,
-			timeout: 60000
+			timeout: 60000,
+			maxTries: 1,
+			interval: 0
 		};
 		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HttpRequest);
 		const kv = isUrlAsOptions 
@@ -107,10 +114,10 @@ export class HttpRequest {
 	}
 
 	// TODO: Request
-	arrayBuffer() {}
-	blob() {}
-	clone() {}
-	formData() {}
-	json() {}
-	text() {}
+	// arrayBuffer() {}
+	// blob() {}
+	// clone() {}
+	// formData() {}
+	// json() {}
+	// text() {}
 }
