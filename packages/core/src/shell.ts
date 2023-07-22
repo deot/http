@@ -35,13 +35,7 @@ export class HttpShell {
 		this.parent = parent;
 	}
 
-	async task(leaf: HttpShellLeaf, fns: HttpHook[]) {
-		return fns.reduceRight((pre, fn) => {
-			pre = pre.then(() => fn(leaf));
-			return pre;
-		}, Promise.resolve(leaf));
-	}
-
+	// 发起请求
 	send(returnLeaf: true): HttpShellLeaf;
 	send(getLeaf?: (leaf: HttpShellLeaf) => void): Promise<HttpResponse>;
 	send(value?: ((leaf: HttpShellLeaf) => void)| boolean) {
@@ -65,13 +59,14 @@ export class HttpShell {
 					const ajax = this.after(leaf);
 					const { timeout } = leaf.originalRequest;
 					const races = [ajax, cancel];
-					if (timeout) {
-						races.push(
-							new Promise((_, reject$) => {
-								leaf.timeout = setTimeout(() => reject$(this.error(leaf, ERROR_CODE.HTTP_REQUEST_TIMEOUT)), timeout);
-							})
-						);
-					}
+					timeout && races.push(
+						new Promise((_, reject$) => {
+							leaf.timeout = setTimeout(
+								() => reject$(this.error(leaf, ERROR_CODE.HTTP_REQUEST_TIMEOUT)),
+								timeout
+							);
+						})
+					);
 					return Promise.race(races);
 				})
 				.then(() => (response = (leaf.response as HttpResponse)))
@@ -102,13 +97,43 @@ export class HttpShell {
 			: target;
 	}
 
-	async cancel(id?: string | HttpShellLeaf) {
+	// `@internal`
+	async task(leaf: HttpShellLeaf, fns: HttpHook[]) {
+		return fns.reduceRight((pre, fn) => {
+			pre = pre.then(() => fn(leaf));
+			return pre;
+		}, Promise.resolve(leaf));
+	}
+
+	// `@internal`
+	async clear(leaf: HttpShellLeaf): Promise<void> {
+		const { timeout, id } = leaf;
+		timeout && clearTimeout(timeout);
+
+		await this.loaded(leaf);
+
+		// clear keyValue
+		Object.keys(leaf).forEach(key => delete leaf[key]);
+		delete this.leafs[id];
+
+		// 当都已经完成时，通知父层移除以减少占用
+		if (!Object.keys(this.leafs).length) {
+			this.parent._remove(this);
+		}
+	}
+
+	/**
+	 * 请求完成后清理，避免内存泄漏
+	 * @param {string|HttpShellLeaf} id 当前请求或当前请求id
+	 * @returns {Promise<void>} ~
+	 */
+	async cancel(id?: string | HttpShellLeaf): Promise<void> {
 		if (id) {
 			const leaf = typeof id === 'string' ? this.leafs[id] : id;
 			if (leaf?.cancel && leaf?.target) {
 				leaf.cancel();
 				await new Promise<void>(resolve => { 
-					leaf.target!.catch(() => {}).finally(resolve);
+					leaf.target.catch(() => {}).finally(resolve);
 				});
 			}
 		} else {
@@ -119,23 +144,12 @@ export class HttpShell {
 		}
 	}
 
-	async clear(leaf: HttpShellLeaf) {
-		const { timeout, id } = leaf;
-		timeout && clearTimeout(timeout);
-
-		await this.loaded(leaf);
-
-		// clear keyValue
-		Object.keys(leaf).forEach(key => delete leaf[key]);
-		delete this.leafs[id];
-
-		// 当都已经完成时，通知父层移除以减少
-		if (!Object.keys(this.leafs).length) {
-			this.parent._remove(this);
-		}
-	}
-
-	async loading(leaf: HttpShellLeaf) {
+	/**
+	 * 请求前完成触发，在onBefore之前
+	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @returns {Promise<void>} ~
+	 */
+	async loading(leaf: HttpShellLeaf): Promise<void> {
 		const { localData, onLoading } = leaf.originalRequest;
 
 		if (!localData) {
@@ -143,7 +157,12 @@ export class HttpShell {
 		}
 	}
 
-	async loaded(leaf: HttpShellLeaf) {
+	/**
+	 * 请求完成触发, 在onAfter之后
+	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @returns {Promise<void>} ~
+	 */
+	async loaded(leaf: HttpShellLeaf): Promise<void> {
 		const { localData, onLoaded } = leaf.originalRequest;
 
 		if (!localData) {
@@ -151,7 +170,12 @@ export class HttpShell {
 		}
 	}
 
-	async before(leaf: HttpShellLeaf) {
+	/**
+	 * 请求前处理，可修改请求信息，或根据结果全局事务
+	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @returns {Promise<void>} ~
+	 */
+	async before(leaf: HttpShellLeaf): Promise<void> {
 		const { apis } = this.parent;
 		const { onBefore } = leaf.originalRequest;
 
@@ -182,7 +206,12 @@ export class HttpShell {
 		}
 	}
 
-	async after(leaf: HttpShellLeaf) {
+	/**
+	 * 请求后处理，可修改返回信息，或根据结果全局事务
+	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @returns {Promise<void>} ~
+	 */
+	async after(leaf: HttpShellLeaf): Promise<void> {
 		const { localData, onAfter } = leaf.request as HttpRequest;
 		
 		let target = localData 
@@ -211,7 +240,14 @@ export class HttpShell {
 		leaf.response = response;
 	}
 
-	error(leaf: HttpShellLeaf, statusText: string, body?: any) {
+	/**
+	 * 错误处理
+	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @param {string} statusText Error Code
+	 * @param {any} body exception
+	 * @returns {HttpResponse} ~
+	 */
+	error(leaf: HttpShellLeaf, statusText: string, body?: any): HttpResponse {
 		return HttpResponse.error(statusText, {
 			body,
 			[`@@internal`]: {

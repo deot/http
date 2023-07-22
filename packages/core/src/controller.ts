@@ -34,6 +34,12 @@ export class HttpController {
 		this.shells = [];
 	}
 
+	/**
+	 * 发起一个请求，返回Promise<HttpResponse>
+	 * @param {string|HttpRequest|HttpRequestOptions} url ~
+	 * @param {HttpRequestOptions} requestOptions ~
+	 * @returns {Promise<HttpResponse>} ~
+	 */
 	http(
 		url: string | HttpRequest | HttpRequestOptions, 
 		requestOptions?: HttpRequestOptions,
@@ -43,6 +49,12 @@ export class HttpController {
 		return shell.send();
 	}
 
+	/**
+	 * 发起一个请求，返回HttpShell, 支持单个重复发送，取消操作
+	 * @param {string|HttpRequest|HttpRequestOptions} url ~
+	 * @param {HttpRequestOptions} requestOptions ~
+	 * @returns {HttpShell} ~
+	 */
 	custom(
 		url: string | HttpRequest | HttpRequestOptions, 
 		requestOptions?: HttpRequestOptions,
@@ -52,6 +64,10 @@ export class HttpController {
 		return shell;
 	}
 
+	/**
+	 * 取消所有请求或取消指定请求
+	 * @param {string|HttpShellLeaf} id ~
+	 */
 	async cancel(id?: string | HttpShellLeaf) {
 		await this.shells.reduce((pre, shell) => {
 			pre = pre.then(() => shell.cancel(id));
