@@ -1,6 +1,6 @@
 /* eslint-disable lines-between-class-members */
 
-export interface HttpResponseOptions {
+export interface HTTPResponseOptions {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
@@ -16,7 +16,7 @@ export interface HttpResponseOptions {
 	ok?: boolean;
 }
 
-export class HttpResponse {
+export class HTTPResponse {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
@@ -34,8 +34,8 @@ export class HttpResponse {
 	// Custom
 
 	constructor(
-		body?: BodyInit | null | HttpResponse | HttpResponseOptions, 
-		options?: HttpResponseOptions
+		body?: BodyInit | null | HTTPResponse | HTTPResponseOptions, 
+		options?: HTTPResponseOptions
 	) {
 		const defaults = {
 			// From Response
@@ -49,9 +49,9 @@ export class HttpResponse {
 			url: ''
 		};
 
-		const isBodyAsOptions = body && (body.constructor === Object || body instanceof HttpResponse);
+		const isBodyAsOptions = body && (body.constructor === Object || body instanceof HTTPResponse);
 		const kv = isBodyAsOptions 
-			? { ...defaults, ...(body as (HttpResponse | HttpResponseOptions)), ...options } 
+			? { ...defaults, ...(body as (HTTPResponse | HTTPResponseOptions)), ...options } 
 			: { ...defaults, body, ...options };
 
 		Object.keys(kv).forEach((key) => {
@@ -62,8 +62,8 @@ export class HttpResponse {
 	}
 
 	// From Response
-	static error(statusText?: string, options?: HttpResponseOptions) {
-		return new HttpResponse(null, {
+	static error(statusText?: string, options?: HTTPResponseOptions) {
+		return new HTTPResponse(null, {
 			...options,
 			type: 'error',
 			status: 0,

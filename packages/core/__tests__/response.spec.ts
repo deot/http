@@ -1,8 +1,8 @@
-import { HttpResponse } from '@deot/http-core';
+import { HTTPResponse } from '@deot/http-core';
 
 describe('response.ts', () => {
 	it('basic', () => {
-		const response = new HttpResponse({ allowExtraKey: true });
+		const response = new HTTPResponse({ allowExtraKey: true });
 		expect(response.body).toBe(null);
 		expect(response.ok).toBe(true);
 		expect(response.status).toBe(200);

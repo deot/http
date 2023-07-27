@@ -1,8 +1,8 @@
-import { HttpController } from "@deot/http-core";
-import type { HttpControllerOptions } from "@deot/http-core";
+import { HTTPController } from "@deot/http-core";
+import type { HTTPControllerOptions } from "@deot/http-core";
 
-export const createHttpClient = (options: HttpControllerOptions) => {
-	const client = new HttpController({
+export const createHttpClient = (options: HTTPControllerOptions) => {
+	const client = new HTTPController({
 		// provider
 		...options
 	});
@@ -10,4 +10,4 @@ export const createHttpClient = (options: HttpControllerOptions) => {
 	return client;
 };
 
-export const Network = createHttpClient({} as HttpControllerOptions);
+export const Network = createHttpClient({} as HTTPControllerOptions);

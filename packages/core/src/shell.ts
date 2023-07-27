@@ -1,57 +1,57 @@
 /* eslint-disable no-promise-executor-return */
 /* eslint-disable no-dupe-class-members */
 /* eslint-disable lines-between-class-members */
-import type { HttpController } from "./controller";
+import type { HTTPController } from "./controller";
 
-import { HttpRequest } from "./request";
-import { HttpResponse } from "./response";
+import { HTTPRequest } from "./request";
+import { HTTPResponse } from "./response";
 import { ERROR_CODE } from './error';
 import { getUid } from './utils';
-import type { HttpRequestOptions, HttpHook } from "./request";
+import type { HTTPRequestOptions, HTTPHook } from "./request";
 
-export interface HttpShellLeaf {
+export interface HTTPShellLeaf {
 	id: string;
 	cancel?: () => void; 
 	timeout?: any;
-	request?: HttpRequest;
-	originalRequest: HttpRequest;
-	response?: HttpResponse;
-	originalResponse?: HttpResponse;
-	target: Promise<HttpResponse>;
+	request?: HTTPRequest;
+	originalRequest: HTTPRequest;
+	response?: HTTPResponse;
+	originalResponse?: HTTPResponse;
+	target: Promise<HTTPResponse>;
 }
-export class HttpShell {
-	parent: HttpController;
+export class HTTPShell {
+	parent: HTTPController;
 
-	request: HttpRequest;
+	request: HTTPRequest;
 
-	leafs: Record<string, HttpShellLeaf> = {};
+	leafs: Record<string, HTTPShellLeaf> = {};
 
 	constructor(
-		url: string | HttpRequest | HttpRequestOptions, 
-		requestOptions: HttpRequestOptions | undefined,
-		parent: HttpController
+		url: string | HTTPRequest | HTTPRequestOptions, 
+		requestOptions: HTTPRequestOptions | undefined,
+		parent: HTTPController
 	) {
-		this.request = new HttpRequest(url, requestOptions, parent.request);
+		this.request = new HTTPRequest(url, requestOptions, parent.request);
 		this.parent = parent;
 	}
 
 	// 发起请求
-	send(returnLeaf: true): HttpShellLeaf;
-	send(getLeaf?: (leaf: HttpShellLeaf) => void): Promise<HttpResponse>;
-	send(value?: ((leaf: HttpShellLeaf) => void)| boolean) {
+	send(returnLeaf: true): HTTPShellLeaf;
+	send(getLeaf?: (leaf: HTTPShellLeaf) => void): Promise<HTTPResponse>;
+	send(value?: ((leaf: HTTPShellLeaf) => void)| boolean) {
 		this.parent._add(this);
 
 		const id = getUid(`shell.leaf`);
-		const leaf = { id, originalRequest: this.request } as HttpShellLeaf;
+		const leaf = { id, originalRequest: this.request } as HTTPShellLeaf;
 		this.leafs[id] = leaf;
 
 		const cancel = new Promise((_, reject) => {
 			leaf.cancel = () => reject(this.error(leaf, ERROR_CODE.HTTP_CANCEL));
 		});
 
-		let error: HttpResponse;
-		let response: HttpResponse;
-		const target = new Promise<HttpResponse>((resolve, reject) => {
+		let error: HTTPResponse;
+		let response: HTTPResponse;
+		const target = new Promise<HTTPResponse>((resolve, reject) => {
 			Promise.resolve()
 				.then(() => this.loading(leaf))
 				.then(() => this.before(leaf))
@@ -69,13 +69,13 @@ export class HttpShell {
 					);
 					return Promise.race(races);
 				})
-				.then(() => (response = (leaf.response as HttpResponse)))
+				.then(() => (response = (leaf.response as HTTPResponse)))
 				.catch(e => (error = e))
 				.then(() => this.clear(leaf))
 				.then(() => {
 					const isError = error || response.type === 'error';
 					// maxTries
-					const request = new HttpRequest(this.request);
+					const request = new HTTPRequest(this.request);
 					request.maxTries -= 1;
 					if (isError && request.maxTries >= 1) {
 						return Promise.resolve()
@@ -98,7 +98,7 @@ export class HttpShell {
 	}
 
 	// `@internal`
-	async task(leaf: HttpShellLeaf, fns: HttpHook[]) {
+	async task(leaf: HTTPShellLeaf, fns: HTTPHook[]) {
 		return fns.reduceRight((pre, fn) => {
 			pre = pre.then(() => fn(leaf));
 			return pre;
@@ -106,7 +106,7 @@ export class HttpShell {
 	}
 
 	// `@internal`
-	async clear(leaf: HttpShellLeaf): Promise<void> {
+	async clear(leaf: HTTPShellLeaf): Promise<void> {
 		const { timeout, id } = leaf;
 		timeout && clearTimeout(timeout);
 
@@ -124,10 +124,10 @@ export class HttpShell {
 
 	/**
 	 * 请求完成后清理，避免内存泄漏
-	 * @param {string|HttpShellLeaf} id 当前请求或当前请求id
+	 * @param {string|HTTPShellLeaf} id 当前请求或当前请求id
 	 * @returns {Promise<void>} ~
 	 */
-	async cancel(id?: string | HttpShellLeaf): Promise<void> {
+	async cancel(id?: string | HTTPShellLeaf): Promise<void> {
 		if (id) {
 			const leaf = typeof id === 'string' ? this.leafs[id] : id;
 			if (leaf?.cancel && leaf?.target) {
@@ -146,10 +146,10 @@ export class HttpShell {
 
 	/**
 	 * 请求前完成触发，在onBefore之前
-	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async loading(leaf: HttpShellLeaf): Promise<void> {
+	async loading(leaf: HTTPShellLeaf): Promise<void> {
 		const { localData, onLoading } = leaf.originalRequest;
 
 		if (!localData) {
@@ -159,10 +159,10 @@ export class HttpShell {
 
 	/**
 	 * 请求完成触发, 在onAfter之后
-	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async loaded(leaf: HttpShellLeaf): Promise<void> {
+	async loaded(leaf: HTTPShellLeaf): Promise<void> {
 		const { localData, onLoaded } = leaf.originalRequest;
 
 		if (!localData) {
@@ -172,10 +172,10 @@ export class HttpShell {
 
 	/**
 	 * 请求前处理，可修改请求信息，或根据结果全局事务
-	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async before(leaf: HttpShellLeaf): Promise<void> {
+	async before(leaf: HTTPShellLeaf): Promise<void> {
 		const { apis } = this.parent;
 		const { onBefore } = leaf.originalRequest;
 
@@ -186,13 +186,13 @@ export class HttpShell {
 			throw this.error(leaf, ERROR_CODE.HTTP_OPTIONS_REBUILD_FAILED, e);
 		}
 
-		let request: HttpRequest;
-		if (result instanceof HttpRequest) {
-			request = new HttpRequest(result);
+		let request: HTTPRequest;
+		if (result instanceof HTTPRequest) {
+			request = new HTTPRequest(result);
 		} else if (result === leaf) {
-			request = leaf.request || new HttpRequest(leaf.originalRequest);
+			request = leaf.request || new HTTPRequest(leaf.originalRequest);
 		} else {
-			request = new HttpRequest(leaf.originalRequest!, result);
+			request = new HTTPRequest(leaf.originalRequest!, result);
 		}
 
 		if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
@@ -208,17 +208,17 @@ export class HttpShell {
 
 	/**
 	 * 请求后处理，可修改返回信息，或根据结果全局事务
-	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async after(leaf: HttpShellLeaf): Promise<void> {
-		const { localData, onAfter } = leaf.request as HttpRequest;
+	async after(leaf: HTTPShellLeaf): Promise<void> {
+		const { localData, onAfter } = leaf.request as HTTPRequest;
 		
 		let target = localData 
-			? Promise.resolve(new HttpResponse({ body: localData })) 
+			? Promise.resolve(new HTTPResponse({ body: localData })) 
 			: this.parent.provider(leaf.request!);
 		
-		let response: HttpResponse = await target;
+		let response: HTTPResponse = await target;
 
 		leaf.originalResponse = response;
 
@@ -229,12 +229,12 @@ export class HttpShell {
 			throw this.error(leaf, ERROR_CODE.HTTP_RESPONSE_REBUILD_FAILED, e);
 		}
 
-		if (result instanceof HttpResponse) {
-			response = new HttpResponse(result);
+		if (result instanceof HTTPResponse) {
+			response = new HTTPResponse(result);
 		} else if (result === leaf) {
-			response = leaf.response || new HttpResponse(leaf.originalResponse);
+			response = leaf.response || new HTTPResponse(leaf.originalResponse);
 		} else {
-			response = new HttpResponse(leaf.originalResponse, result);
+			response = new HTTPResponse(leaf.originalResponse, result);
 		}
 
 		leaf.response = response;
@@ -242,13 +242,13 @@ export class HttpShell {
 
 	/**
 	 * 错误处理
-	 * @param {HttpShellLeaf} leaf 当前请求
+	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @param {string} statusText Error Code
 	 * @param {any} body exception
-	 * @returns {HttpResponse} ~
+	 * @returns {HTTPResponse} ~
 	 */
-	error(leaf: HttpShellLeaf, statusText: string, body?: any): HttpResponse {
-		return HttpResponse.error(statusText, {
+	error(leaf: HTTPShellLeaf, statusText: string, body?: any): HTTPResponse {
+		return HTTPResponse.error(statusText, {
 			body,
 			[`@@internal`]: {
 				request: {

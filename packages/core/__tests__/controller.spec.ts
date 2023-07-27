@@ -1,15 +1,15 @@
-import { HttpController, HttpRequest, HttpResponse } from '@deot/http-core';
-import type { HttpControllerOptions } from '@deot/http-core';
+import { HTTPController, HTTPRequest, HTTPResponse } from '@deot/http-core';
+import type { HTTPControllerOptions } from '@deot/http-core';
 
 describe('controller.ts', () => {
-	const Network = new HttpController({
+	const Network = new HTTPController({
 		apis: {
 			A_GET: 'https://xxx.com/api.json'
 		},
-		provider: (request: HttpRequest) => {
+		provider: (request: HTTPRequest) => {
 			return new Promise((resolve) => {
 				setTimeout(() => {
-					resolve(new HttpResponse({ body: request.body }));
+					resolve(new HTTPResponse({ body: request.body }));
 				}, 300);
 			});
 		}
@@ -19,7 +19,7 @@ describe('controller.ts', () => {
 		expect.assertions(1);
 		try {
 			// eslint-disable-next-line no-new
-			new HttpController({} as HttpControllerOptions);
+			new HTTPController({} as HTTPControllerOptions);
 		} catch (e: any) {
 			expect(e.message).toMatch(`provider is required`);
 		}
@@ -27,7 +27,7 @@ describe('controller.ts', () => {
 
 	it('error, empty apis coverage', async () => {
 		// eslint-disable-next-line no-new
-		new HttpController({ provider: {} } as HttpControllerOptions);
+		new HTTPController({ provider: {} } as HTTPControllerOptions);
 		expect(1).toBe(1);
 	});
 
@@ -229,7 +229,7 @@ describe('controller.ts', () => {
 		try {
 			await Network.http('A_GET', {
 				onAfter() {
-					return new HttpResponse({ body, type: 'error' });
+					return new HTTPResponse({ body, type: 'error' });
 				}
 			});
 		} catch (e: any) {
@@ -274,7 +274,7 @@ describe('controller.ts', () => {
 		};
 		const response = await Network.http('A_GET', {
 			onBefore() {
-				return new HttpRequest({ localData: body });
+				return new HTTPRequest({ localData: body });
 			}
 		});
 

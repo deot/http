@@ -1,6 +1,6 @@
-import type { HttpRequest } from "./request";
-import type { HttpResponse } from "./response";
+import type { HTTPRequest } from "./request";
+import type { HTTPResponse } from "./response";
 
-export interface HttpProvider {
-	(request: HttpRequest): Promise<HttpResponse>;
+export interface HTTPProvider {
+	(request: HTTPRequest): Promise<HTTPResponse>;
 }

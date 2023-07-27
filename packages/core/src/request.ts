@@ -1,7 +1,7 @@
 /* eslint-disable lines-between-class-members */
-import type { HttpShellLeaf } from './shell';
+import type { HTTPShellLeaf } from './shell';
 
-export interface HttpRequestOptions {
+export interface HTTPRequestOptions {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
@@ -23,18 +23,18 @@ export interface HttpRequestOptions {
 
 	// Custom
 	localData?: any;
-	onLoading?: HttpHook | HttpHook[];
-	onLoaded?: HttpHook | HttpHook[];
-	onBefore?: HttpHook | HttpHook[];
-	onAfter?: HttpHook | HttpHook[];
+	onLoading?: HTTPHook | HTTPHook[];
+	onLoaded?: HTTPHook | HTTPHook[];
+	onBefore?: HTTPHook | HTTPHook[];
+	onAfter?: HTTPHook | HTTPHook[];
 	timeout?: number;
 	maxTries?: number;
 	// 仅当maxTries > 1 是有效, 可配合做轮询请求
 	interval?: number;
 }
 
-export type HttpHook<T = any> = (leaf: HttpShellLeaf) => T;
-export class HttpRequest {
+export type HTTPHook<T = any> = (leaf: HTTPShellLeaf) => T;
+export class HTTPRequest {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
@@ -57,18 +57,18 @@ export class HttpRequest {
 
 	// Custom
 	localData = null;
-	onLoading!: HttpHook[];
-	onLoaded!: HttpHook[];
-	onBefore!: HttpHook[];
-	onAfter!: HttpHook[];
+	onLoading!: HTTPHook[];
+	onLoaded!: HTTPHook[];
+	onBefore!: HTTPHook[];
+	onAfter!: HTTPHook[];
 	timeout!: number;
 	maxTries!: number;
 	interval!: number;
 
 	constructor(
-		url: string | HttpRequest | HttpRequestOptions, 
-		options?: HttpRequestOptions,
-		parent?: HttpRequest
+		url: string | HTTPRequest | HTTPRequestOptions, 
+		options?: HTTPRequestOptions,
+		parent?: HTTPRequest
 	) {
 		const defaults = {
 			// From Request
@@ -90,9 +90,9 @@ export class HttpRequest {
 			maxTries: 1,
 			interval: 0
 		};
-		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HttpRequest);
+		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HTTPRequest);
 		const kv = isUrlAsOptions 
-			? { ...defaults, ...parent, ...(url as (HttpRequest | HttpRequestOptions)), ...options } 
+			? { ...defaults, ...parent, ...(url as (HTTPRequest | HTTPRequestOptions)), ...options } 
 			: { ...defaults, ...parent, url, ...options };
 
 		Object.keys(kv).forEach((key) => {
