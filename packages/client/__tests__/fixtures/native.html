@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+	<input id="fetch" type="text" value="">
+	<input id="xhr" type="text" value="">
+	<script>
+		window.onerror = console.error;
+	</script>
+
+	<script>
+		const json = { 
+			response: {
+				status: 1,
+				data: {}
+			} 
+		};
+		
+		const blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
+
+		const formData = new FormData();
+		formData.append('response', JSON.stringify(json.response));
+		formData.append('file', blob);
+
+		const file = new File([JSON.stringify(json)], "foo.json", {
+			type: "application/json",
+		});
+
+		const data = {
+			string: JSON.stringify(json),
+			file,
+			blob,
+			formData,
+			arrayBuffer: blob.arrayBuffer(),
+			files: [file, file],
+			URLSearchParams: new URLSearchParams({ response: JSON.stringify(json.response) })
+		};
+	</script>	
+	<script>
+		const makeHandler = (el, http) => async () => {
+			const baseUrl = el.value;
+			const key = el.value?.split('/')?.pop?.();
+			let body = data[key] || data.string;
+			let headers = {};
+			
+			/**
+			 * 不直接支持Blob，需要转为arrayBuffer或添加Content-Type
+			 * 为'application/x-www-form-urlencoded'
+			 * https://github.com/axios/axios/blob/21a5ad34c4a5956d81d338059ac0dd34a19ed094/lib/core/dispatchRequest.js#L45
+			 */
+			if (key === 'blob' || key === 'file') {
+				headers = {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			}
+
+			/**
+			 * 浏览器不需要设置`multipart/form-data`
+			 * 其他环境可能需要设置
+			 * https://github.com/axios/axios/blob/21a5ad34c4a5956d81d338059ac0dd34a19ed094/lib/adapters/xhr.js#L64
+			 */
+			if (key === 'files') {
+				body = new FormData();
+				data.files.forEach((file) => body.append("files[]", file));
+			}
+
+			// 支持Blob
+			if (key === 'arrayBuffer') {
+				body = await data.arrayBuffer;
+			}
+
+			// 支持Blob
+			if (key === 'URLSearchParams') {
+				body = body.toString();
+			}
+
+			http(baseUrl, body, headers).catch(console.log);
+		}
+	</script>
+	<script>
+		{
+			const fetch$ = (baseUrl, body, headers) => {
+				return fetch(baseUrl, { 
+					method: 'POST',
+					body,
+					headers
+				});
+			}
+
+			const el = 	document.querySelector("#fetch");
+			el.addEventListener('input', makeHandler(el, fetch$));
+		}
+	</script>
+
+	<script>
+		{
+			const xhr = (baseUrl, data, headers = {}) => {
+				return new Promise((resolve) => {
+					const xhr$ = new XMLHttpRequest();
+					xhr$.onreadystatechange = () => {
+						if (xhr$.readyState === 4 && xhr$.status >= 200 && xhr$.status < 300) {
+							resolve(JSON.parse(xhr$.responseText));
+						}
+					};
+
+					xhr$.open('POST', baseUrl);
+					Object.keys(headers).forEach(key => {
+						xhr$.setRequestHeader(key, headers[key]);
+					});
+					xhr$.send(data);
+				});
+			};
+
+
+			const el = 	document.querySelector("#xhr");
+			el.addEventListener('input', makeHandler(el, xhr));
+		}
+	</script>
+</body>
+</html>

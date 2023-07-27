@@ -3,3 +3,4 @@ declare module 'lodash'
 declare module 'fs-extra'
 declare module 'inquirer'
 declare module 'inquirer-autocomplete-prompt'
+declare module 'formidable';
