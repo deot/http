@@ -98,11 +98,27 @@ export class HTTPShell {
 	}
 
 	// `@internal`
-	async task(leaf: HTTPShellLeaf, fns: HTTPHook[]) {
-		return fns.reduceRight((pre, fn) => {
-			pre = pre.then(() => fn(leaf));
+	async task(leaf: HTTPShellLeaf, fns: HTTPHook[], done?: (e: any) => void) {
+		let needBreak = false;
+
+		// 至少要执行一次
+		if (!fns.length && done) return done();
+
+		return fns.reduce((pre, fn) => {
+			pre = pre
+				.then(() => {
+					if (!needBreak) {
+						return fn(leaf);
+					}
+					return false;
+				}).then((e) => {
+					!needBreak && done && done(e);
+					if (e === false) {
+						needBreak = true;
+					}
+				});
 			return pre;
-		}, Promise.resolve(leaf));
+		}, Promise.resolve());
 	}
 
 	// `@internal`
@@ -179,27 +195,28 @@ export class HTTPShell {
 		const { apis } = this.parent;
 		const { onBefore } = leaf.originalRequest;
 
-		let result: any;
 		try {			
-			result = (await this.task(leaf, onBefore));
+			await this.task(leaf, onBefore, (result: any) => {
+				let request: HTTPRequest;
+				if (result instanceof HTTPRequest) {
+					request = new HTTPRequest(result);
+				} else if (result === leaf) {
+					request = leaf.request || new HTTPRequest(leaf.originalRequest);
+				} else {
+					request = new HTTPRequest(leaf.originalRequest!, result);
+				}
+				leaf.request = request;
+			});
 		} catch (e) {
 			throw this.error(leaf, ERROR_CODE.HTTP_OPTIONS_REBUILD_FAILED, e);
 		}
 
-		let request: HTTPRequest;
-		if (result instanceof HTTPRequest) {
-			request = new HTTPRequest(result);
-		} else if (result === leaf) {
-			request = leaf.request || new HTTPRequest(leaf.originalRequest);
-		} else {
-			request = new HTTPRequest(leaf.originalRequest!, result);
-		}
+		const request = leaf.request!;
 
 		if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
 			let combo = request.url.split('?'); // 避免before带上?token=*之类
 			request.url = `${apis[combo[0]] || ''}${combo[1] ? `?${combo[1]}` : ''}`;
 		}
-		leaf.request = request;
 
 		if (!request.url && !request.localData) {
 			throw this.error(leaf, ERROR_CODE.HTTP_URL_EMPTY);
@@ -218,26 +235,26 @@ export class HTTPShell {
 			? Promise.resolve(new HTTPResponse({ body: localData })) 
 			: this.parent.provider(leaf.request!);
 		
-		let response: HTTPResponse = await target;
+		let originalResponse: HTTPResponse = await target;
 
-		leaf.originalResponse = response;
+		leaf.originalResponse = originalResponse;
 
-		let result: any;
 		try {
-			result = (await this.task(leaf, onAfter));
+			await this.task(leaf, onAfter, (result: any) => {
+				let response: HTTPResponse;
+				if (result instanceof HTTPResponse) {
+					response = new HTTPResponse(result);
+				} else if (result === leaf) {
+					response = leaf.response || new HTTPResponse(leaf.originalResponse);
+				} else {
+					response = new HTTPResponse(leaf.originalResponse, result);
+				}
+
+				leaf.response = response;
+			});
 		} catch (e) {
 			throw this.error(leaf, ERROR_CODE.HTTP_RESPONSE_REBUILD_FAILED, e);
 		}
-
-		if (result instanceof HTTPResponse) {
-			response = new HTTPResponse(result);
-		} else if (result === leaf) {
-			response = leaf.response || new HTTPResponse(leaf.originalResponse);
-		} else {
-			response = new HTTPResponse(leaf.originalResponse, result);
-		}
-
-		leaf.response = response;
 	}
 
 	/**

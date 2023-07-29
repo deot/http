@@ -107,7 +107,7 @@ export class HTTPRequest {
 		hooks.forEach((key) => {
 			const fn = it[key];
 			const current = Array.isArray(fn) ? fn : fn ? [fn] : [];
-			this[key] = (parent ? parent[key].concat(current) : current).filter((v, i, source) => {
+			this[key] = (parent ? current.concat(parent[key]) : current).filter((v, i, source) => {
 				return source.indexOf(v) === i;
 			});
 		});

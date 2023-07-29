@@ -323,4 +323,49 @@ describe('controller.ts', () => {
 		expect(count).toBe(10);
 		expect(response.body).toBe(body);
 	});
+
+	it('task/coverage', async () => {
+		let count = 0;
+		const body = {
+			status: 1,
+			data: {}
+		};
+		await Network.http('A_GET', {
+			localData: body,
+			onBefore: [
+				(leaf) => {
+					count++;
+					return leaf;
+				},
+				() => {
+					count++;
+					return false;
+				},
+				() => {
+					count += 10;
+				},
+				() => {
+					count += 10;
+				}
+			],
+			onAfter: [
+				(leaf) => {
+					count++;
+					return leaf;
+				},
+				() => {
+					count++;
+					return false;
+				},
+				() => {
+					count += 10;
+				},
+				() => {
+					count += 10;
+				}
+			],
+		});
+
+		expect(count).toBe(4);
+	});
 });
