@@ -1,5 +1,7 @@
 /* eslint-disable lines-between-class-members */
 import type { HTTPShellLeaf } from './shell';
+import type { HTTPProvider } from './provider';
+import { HTTPResponse } from './response';
 
 export interface HTTPRequestOptions {
 	// Allow Extra KeyValue
@@ -30,8 +32,12 @@ export interface HTTPRequestOptions {
 	maxTries?: number;
 	// 仅当maxTries > 1 是有效, 可配合做轮询请求
 	interval?: number;
+
+	// 提供者/适配器
+	provider?: HTTPProvider;
 }
 
+const defaultProvider = (request: HTTPRequest) => new HTTPResponse({ body: request.body }); // TODO: 也可以考虑抛出错误
 export type HTTPHook<T = any> = (leaf: HTTPShellLeaf) => T;
 export class HTTPRequest {
 	// Allow Extra KeyValue
@@ -62,6 +68,7 @@ export class HTTPRequest {
 	timeout!: number;
 	maxTries!: number;
 	interval!: number;
+	provider!: HTTPProvider;
 
 	constructor(
 		url: string | HTTPRequest | HTTPRequestOptions, 
@@ -85,7 +92,8 @@ export class HTTPRequest {
 			localData: null,
 			timeout: 60000,
 			maxTries: 1,
-			interval: 0
+			interval: 0,
+			provider: defaultProvider
 		};
 		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HTTPRequest);
 		const kv = isUrlAsOptions 

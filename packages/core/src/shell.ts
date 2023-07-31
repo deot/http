@@ -225,11 +225,11 @@ export class HTTPShell {
 	 * @returns {Promise<void>} ~
 	 */
 	async after(leaf: HTTPShellLeaf): Promise<void> {
-		const { localData, onAfter } = leaf.request as HTTPRequest;
+		const { localData, onAfter, provider } = leaf.request!;
 		
 		let target = localData 
 			? Promise.resolve(new HTTPResponse({ body: localData })) 
-			: this.parent.provider(leaf.request!, leaf);
+			: provider(leaf.request!, leaf);
 		
 		let originalResponse: HTTPResponse;
 

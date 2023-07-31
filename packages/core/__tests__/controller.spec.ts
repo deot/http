@@ -1,5 +1,4 @@
 import { HTTPController, HTTPRequest, HTTPResponse } from '@deot/http-core';
-import type { HTTPControllerOptions } from '@deot/http-core';
 
 describe('controller.ts', () => {
 	const Network = new HTTPController({
@@ -14,20 +13,11 @@ describe('controller.ts', () => {
 		}
 	});
 
-	it('error, empty provider', async () => {
-		expect.assertions(1);
-		try {
-			// eslint-disable-next-line no-new
-			new HTTPController({} as HTTPControllerOptions);
-		} catch (e: any) {
-			expect(e.message).toMatch(`provider is required`);
-		}
-	});
-
-	it('error, empty apis coverage', async () => {
-		// eslint-disable-next-line no-new
-		new HTTPController({ provider: {} } as HTTPControllerOptions);
-		expect(1).toBe(1);
+	it('default', async () => {
+		const controller = new HTTPController();
+		const body = {};
+		const response = await controller.http('xxx', { body });
+		expect(response.body).toEqual(body);
 	});
 
 	it('error, empty url', async () => {

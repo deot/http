@@ -1,4 +1,3 @@
-import type { HTTPProvider } from "./provider";
 import type { HTTPRequestOptions } from "./request";
 import type { HTTPResponse } from "./response";
 import { HTTPRequest } from "./request";
@@ -6,26 +5,13 @@ import { HTTPRequest } from "./request";
 import { HTTPShell } from "./shell";
 import type { HTTPShellLeaf } from "./shell";
 
-export type HTTPControllerOptions = HTTPRequestOptions & {
-	provider: HTTPProvider;
-}
-
 export class HTTPController {
-	provider: HTTPProvider;
-
 	request: HTTPRequest;
 
 	shells: HTTPShell[];
 
-	constructor(options: HTTPControllerOptions) {
-		if (!options?.provider) {
-			throw new Error('[@deot/http-core]: provider is required.');
-		}
-
-		const { provider, ...globalOptions } = options;
-		
-		this.provider = provider;
-		this.request = new HTTPRequest(globalOptions);
+	constructor(options?: HTTPRequestOptions) {
+		this.request = new HTTPRequest(options || {});
 
 		this.shells = [];
 	}
