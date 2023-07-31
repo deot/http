@@ -3,13 +3,12 @@ import type { HTTPControllerOptions } from '@deot/http-core';
 
 describe('controller.ts', () => {
 	const Network = new HTTPController({
-		apis: {
-			A_GET: 'https://xxx.com/api.json'
-		},
 		provider: (request: HTTPRequest) => {
-			return new Promise((resolve) => {
+			return new Promise((resolve, reject) => {
 				setTimeout(() => {
-					resolve(new HTTPResponse({ body: request.body }));
+					request.reject 
+						? reject(HTTPResponse.error('', request)) 
+						: resolve(new HTTPResponse({ body: request.body }));
 				}, 300);
 			});
 		}
@@ -46,23 +45,8 @@ describe('controller.ts', () => {
 		}
 	});
 
-	it('error, empty url', async () => {
-		expect.assertions(6);
-
-		try {
-			await Network.http('xxx', {});
-		} catch (e: any) {
-			expect(e.body).toBe(null);
-			expect(e.status).toBe(0);
-			expect(e.ok).toBe(false);
-			expect(e.type).toBe('error');
-			expect(e.statusText).toBe('HTTP_URL_EMPTY');
-			expect(Network.shells.length).toBe(0);
-		}
-	});
-
 	it('success, body', async () => {
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			body: {}
 		});
 
@@ -70,19 +54,23 @@ describe('controller.ts', () => {
 		expect(response.body).toEqual({});
 	});
 
-	it('success, body, query', async () => {
-		const response = await Network.http('A_GET?token=1', {
-			body: {}
-		});
-
-		expect(Network.shells.length).toBe(0);
-		expect(response.body).toEqual({});
+	it('error, body', async () => {
+		expect.assertions(2);
+		try {
+			await Network.http('xxx', {
+				reject: true,
+				body: {}
+			});
+		} catch (e: any) {
+			expect(Network.shells.length).toBe(0);
+			expect(e.body).toEqual({});
+		}
 	});
 
 	it('timeout', async () => {
 		expect.assertions(6);
 		try {
-			await Network.http('A_GET', {
+			await Network.http('xxx', {
 				timeout: 100
 			});
 		} catch (e: any) {
@@ -96,7 +84,7 @@ describe('controller.ts', () => {
 	});
 
 	it('timeout, unlimited', async () => {
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			timeout: 0
 		});
 		expect(response.body).toEqual(null);
@@ -104,7 +92,7 @@ describe('controller.ts', () => {
 
 	it('cancel', async () => {
 		expect.assertions(10);
-		const shell = Network.custom('A_GET');
+		const shell = Network.custom('xxx');
 		shell.send((leaf) => {
 			expect(typeof leaf.id).toBe('string');
 		}).catch((e) => {
@@ -126,7 +114,7 @@ describe('controller.ts', () => {
 
 	it('cancel by controller', async () => {
 		expect.assertions(3);
-		const shell = Network.custom('A_GET');
+		const shell = Network.custom('xxx');
 		shell.send().catch((e) => {
 			expect(e.statusText).toBe('HTTP_CANCEL');
 		});
@@ -137,7 +125,7 @@ describe('controller.ts', () => {
 
 	it('cancel by controller, leaf', async () => {
 		expect.assertions(3);
-		const shell = Network.custom('A_GET');
+		const shell = Network.custom('xxx');
 		shell.send().catch((e) => {
 			expect(e.statusText).toBe('HTTP_CANCEL');
 		});
@@ -150,7 +138,7 @@ describe('controller.ts', () => {
 
 	it('cancel by controller, multiple send', async () => {
 		expect.assertions(4);
-		const shell = Network.custom('A_GET');
+		const shell = Network.custom('xxx');
 		shell.send().catch((e) => {
 			expect(e.statusText).toBe('HTTP_CANCEL');
 		});
@@ -166,7 +154,7 @@ describe('controller.ts', () => {
 
 	it('send, get leaf', async () => {
 		expect.assertions(3);
-		const shell = Network.custom('A_GET');
+		const shell = Network.custom('xxx');
 		const leaf = shell.send(true);
 
 		leaf.target.catch((e) => {
@@ -184,7 +172,7 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			localData: body
 		});
 
@@ -195,7 +183,7 @@ describe('controller.ts', () => {
 		expect.assertions(1);
 		const message = new Error('any');
 		try {
-			await Network.http('A_GET', {
+			await Network.http('xxx', {
 				onAfter() {
 					throw message;
 				}
@@ -211,7 +199,7 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			onAfter() {
 				return { body };
 			}
@@ -227,7 +215,7 @@ describe('controller.ts', () => {
 			data: {}
 		};
 		try {
-			await Network.http('A_GET', {
+			await Network.http('xxx', {
 				onAfter() {
 					return new HTTPResponse({ body, type: 'error' });
 				}
@@ -241,7 +229,7 @@ describe('controller.ts', () => {
 		expect.assertions(1);
 		const message = new Error('any');
 		try {
-			await Network.http('A_GET', {
+			await Network.http('xxx', {
 				onBefore() {
 					throw message;
 				}
@@ -257,7 +245,7 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			onBefore() {
 				return { localData: body };
 			}
@@ -272,7 +260,7 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			onBefore() {
 				return new HTTPRequest({ localData: body });
 			}
@@ -284,7 +272,7 @@ describe('controller.ts', () => {
 	it('onLoading/onLoaded', async () => {
 		expect.assertions(2);
 		try {
-			await Network.http('A_GET', {
+			await Network.http('xxx', {
 				onBefore() {
 					throw new Error('any');
 				},
@@ -307,7 +295,7 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
-		const response = await Network.http('A_GET', {
+		const response = await Network.http('xxx', {
 			maxTries,
 			interval: 2,
 			onBefore() {
@@ -330,7 +318,7 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
-		await Network.http('A_GET', {
+		await Network.http('xxx', {
 			localData: body,
 			onBefore: [
 				(leaf) => {

@@ -8,13 +8,10 @@ import type { HTTPShellLeaf } from "./shell";
 
 export type HTTPControllerOptions = HTTPRequestOptions & {
 	provider: HTTPProvider;
-	apis?: Record<string, string>;
 }
 
 export class HTTPController {
 	provider: HTTPProvider;
-
-	apis: Record<string, string>;
 
 	request: HTTPRequest;
 
@@ -25,10 +22,9 @@ export class HTTPController {
 			throw new Error('[@deot/http-core]: provider is required.');
 		}
 
-		const { provider, apis = {}, ...globalOptions } = options;
+		const { provider, ...globalOptions } = options;
 		
 		this.provider = provider;
-		this.apis = apis;
 		this.request = new HTTPRequest(globalOptions);
 
 		this.shells = [];

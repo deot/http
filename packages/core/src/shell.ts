@@ -11,13 +11,14 @@ import type { HTTPRequestOptions, HTTPHook } from "./request";
 
 export interface HTTPShellLeaf {
 	id: string;
-	cancel?: () => void; 
-	timeout?: any;
-	request?: HTTPRequest;
+	cancel: () => void; 
+	timeout: any;
+	target: Promise<HTTPResponse>;
 	originalRequest: HTTPRequest;
+
+	request?: HTTPRequest;
 	response?: HTTPResponse;
 	originalResponse?: HTTPResponse;
-	target: Promise<HTTPResponse>;
 
 	// 让provider可以设值
 	[key: string]: any;
@@ -195,7 +196,6 @@ export class HTTPShell {
 	 * @returns {Promise<void>} ~
 	 */
 	async before(leaf: HTTPShellLeaf): Promise<void> {
-		const { apis } = this.parent;
 		const { onBefore } = leaf.originalRequest;
 
 		try {			
@@ -214,14 +214,7 @@ export class HTTPShell {
 			throw this.error(leaf, ERROR_CODE.HTTP_OPTIONS_REBUILD_FAILED, e);
 		}
 
-		const request = leaf.request!;
-
-		if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
-			let combo = request.url.split('?'); // 避免before带上?token=*之类
-			request.url = `${apis[combo[0]] || ''}${combo[1] ? `?${combo[1]}` : ''}`;
-		}
-
-		if (!request.url && !request.localData) {
+		if (!leaf.request!.url && !leaf.request!.localData) {
 			throw this.error(leaf, ERROR_CODE.HTTP_URL_EMPTY);
 		}
 	}
