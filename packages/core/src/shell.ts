@@ -18,6 +18,9 @@ export interface HTTPShellLeaf {
 	response?: HTTPResponse;
 	originalResponse?: HTTPResponse;
 	target: Promise<HTTPResponse>;
+
+	// 让provider可以设值
+	[key: string]: any;
 }
 export class HTTPShell {
 	parent: HTTPController;
@@ -98,7 +101,7 @@ export class HTTPShell {
 	}
 
 	// `@internal`
-	async task(leaf: HTTPShellLeaf, fns: HTTPHook[], done?: (e: any) => void) {
+	async task(leaf: HTTPShellLeaf, fns: HTTPHook[], done?: (e?: any) => void) {
 		let needBreak = false;
 
 		// 至少要执行一次
@@ -233,9 +236,15 @@ export class HTTPShell {
 		
 		let target = localData 
 			? Promise.resolve(new HTTPResponse({ body: localData })) 
-			: this.parent.provider(leaf.request!);
+			: this.parent.provider(leaf.request!, leaf);
 		
-		let originalResponse: HTTPResponse = await target;
+		let originalResponse: HTTPResponse;
+
+		try {
+			originalResponse = await target;
+		} catch (e) {
+			originalResponse = e as HTTPResponse;
+		}
 
 		leaf.originalResponse = originalResponse;
 
