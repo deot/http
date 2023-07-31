@@ -7,7 +7,7 @@ export interface HTTPRequestOptions {
 
 	url?: string;
 
-	// From RequestInit
+	// From Request, removed(signal)
 	method?: string;
 	headers?: HeadersInit;
 	body?: Record<string, any> | BodyInit | null;
@@ -19,7 +19,6 @@ export interface HTTPRequestOptions {
 	integrity?: string;
 	keepalive?: boolean;
 	referrerPolicy?: ReferrerPolicy;
-	signal?: AbortSignal | null;
 
 	// Custom
 	localData?: any;
@@ -38,7 +37,7 @@ export class HTTPRequest {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
-	// From Request
+	// From Request, removed(signal)
 	url!: string;
 	method!: string;
 	headers!: HeadersInit;
@@ -51,7 +50,6 @@ export class HTTPRequest {
 	integrity!: string;
 	keepalive!: boolean;
 	referrerPolicy!: ReferrerPolicy;
-	signal!: AbortSignal;
 	// TODO: ~
 	bodyUsed!: boolean;
 
@@ -71,7 +69,7 @@ export class HTTPRequest {
 		parent?: HTTPRequest
 	) {
 		const defaults = {
-			// From Request
+			// From Request, removed(signal)
 			method: 'GET',
 			headers: {},
 			body: null,
@@ -83,7 +81,6 @@ export class HTTPRequest {
 			keepalive: false,
 			referrer: 'about:client',
 			referrerPolicy: '',
-			signal: new AbortController().signal,
 			// Custom
 			localData: null,
 			timeout: 60000,
