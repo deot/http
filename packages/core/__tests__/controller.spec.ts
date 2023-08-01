@@ -169,12 +169,12 @@ describe('controller.ts', () => {
 		expect(response.body).toBe(body);
 	});
 
-	it('onAfter, error', async () => {
+	it('onResponse, error', async () => {
 		expect.assertions(1);
 		const message = new Error('any');
 		try {
 			await Network.http('xxx', {
-				onAfter() {
+				onResponse() {
 					throw message;
 				}
 			});
@@ -183,14 +183,14 @@ describe('controller.ts', () => {
 		}
 	});
 
-	it('onAfter, success', async () => {
+	it('onResponse, success', async () => {
 		expect.assertions(1);
 		const body = {
 			status: 1,
 			data: {}
 		};
 		const response = await Network.http('xxx', {
-			onAfter() {
+			onResponse() {
 				return { body };
 			}
 		});
@@ -198,7 +198,7 @@ describe('controller.ts', () => {
 		expect(response.body).toBe(body);
 	});
 
-	it('onAfter, error, HttpResponse', async () => {
+	it('onResponse, error, HttpResponse', async () => {
 		expect.assertions(1);
 		const body = {
 			status: 1,
@@ -206,7 +206,7 @@ describe('controller.ts', () => {
 		};
 		try {
 			await Network.http('xxx', {
-				onAfter() {
+				onResponse() {
 					return new HTTPResponse({ body, type: 'error' });
 				}
 			});
@@ -215,12 +215,12 @@ describe('controller.ts', () => {
 		}
 	});
 
-	it('onBefore, error', async () => {
+	it('onRequest, error', async () => {
 		expect.assertions(1);
 		const message = new Error('any');
 		try {
 			await Network.http('xxx', {
-				onBefore() {
+				onRequest() {
 					throw message;
 				}
 			});
@@ -229,14 +229,14 @@ describe('controller.ts', () => {
 		}
 	});
 
-	it('onBefore, success', async () => {
+	it('onRequest, success', async () => {
 		expect.assertions(1);
 		const body = {
 			status: 1,
 			data: {}
 		};
 		const response = await Network.http('xxx', {
-			onBefore() {
+			onRequest() {
 				return { localData: body };
 			}
 		});
@@ -244,14 +244,14 @@ describe('controller.ts', () => {
 		expect(response.body).toBe(body);
 	});
 
-	it('onBefore, success, HttpResponse', async () => {
+	it('onRequest, success, HttpResponse', async () => {
 		expect.assertions(1);
 		const body = {
 			status: 1,
 			data: {}
 		};
 		const response = await Network.http('xxx', {
-			onBefore() {
+			onRequest() {
 				return new HTTPRequest({ localData: body });
 			}
 		});
@@ -259,17 +259,17 @@ describe('controller.ts', () => {
 		expect(response.body).toBe(body);
 	});
 
-	it('onLoading/onLoaded', async () => {
+	it('onStart/onFinish', async () => {
 		expect.assertions(2);
 		try {
 			await Network.http('xxx', {
-				onBefore() {
+				onRequest() {
 					throw new Error('any');
 				},
-				onLoading() {
+				onStart() {
 					expect(1).toBe(1);
 				},
-				onLoaded() {
+				onFinish() {
 					expect(1).toBe(1);
 				}
 			});
@@ -288,7 +288,7 @@ describe('controller.ts', () => {
 		const response = await Network.http('xxx', {
 			maxTries,
 			interval: 2,
-			onBefore() {
+			onRequest() {
 				count++;
 				if (count < maxTries) {
 					throw new Error('any');
@@ -310,7 +310,7 @@ describe('controller.ts', () => {
 		};
 		await Network.http('xxx', {
 			localData: body,
-			onBefore: [
+			onRequest: [
 				(leaf) => {
 					count++;
 					return leaf;
@@ -326,7 +326,7 @@ describe('controller.ts', () => {
 					count += 10;
 				}
 			],
-			onAfter: [
+			onResponse: [
 				(leaf) => {
 					count++;
 					return leaf;

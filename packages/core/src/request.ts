@@ -24,10 +24,10 @@ export interface HTTPRequestOptions {
 
 	// Custom
 	localData?: any;
-	onLoading?: HTTPHook | HTTPHook[];
-	onLoaded?: HTTPHook | HTTPHook[];
-	onBefore?: HTTPHook | HTTPHook[];
-	onAfter?: HTTPHook | HTTPHook[];
+	onStart?: HTTPHook | HTTPHook[];
+	onFinish?: HTTPHook | HTTPHook[];
+	onRequest?: HTTPHook | HTTPHook[];
+	onResponse?: HTTPHook | HTTPHook[];
 	timeout?: number;
 	maxTries?: number;
 	// 仅当maxTries > 1 是有效, 可配合做轮询请求
@@ -61,10 +61,10 @@ export class HTTPRequest {
 
 	// Custom
 	localData = null;
-	onLoading!: HTTPHook[];
-	onLoaded!: HTTPHook[];
-	onBefore!: HTTPHook[];
-	onAfter!: HTTPHook[];
+	onStart!: HTTPHook[];
+	onFinish!: HTTPHook[];
+	onRequest!: HTTPHook[];
+	onResponse!: HTTPHook[];
 	timeout!: number;
 	maxTries!: number;
 	interval!: number;
@@ -108,7 +108,7 @@ export class HTTPRequest {
 
 		// Merge Hooks & Filter Same
 		const it = (url && typeof url === 'object' ? url : options) || {};
-		const hooks = ['onLoading', 'onLoaded', 'onBefore', 'onAfter'] as const;
+		const hooks = ['onStart', 'onFinish', 'onRequest', 'onResponse'] as const;
 		hooks.forEach((key) => {
 			const fn = it[key];
 			const current = Array.isArray(fn) ? fn : fn ? [fn] : [];

@@ -165,28 +165,28 @@ export class HTTPShell {
 	}
 
 	/**
-	 * 请求前完成触发，在onBefore之前
+	 * 请求前完成触发，在onRequest之前
 	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
 	async loading(leaf: HTTPShellLeaf): Promise<void> {
-		const { localData, onLoading } = leaf.originalRequest;
+		const { localData, onStart } = leaf.originalRequest;
 
 		if (!localData) {
-			await this.task(leaf, onLoading);
+			await this.task(leaf, onStart);
 		}
 	}
 
 	/**
-	 * 请求完成触发, 在onAfter之后
+	 * 请求完成触发, 在onResponse之后
 	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
 	async loaded(leaf: HTTPShellLeaf): Promise<void> {
-		const { localData, onLoaded } = leaf.originalRequest;
+		const { localData, onFinish } = leaf.originalRequest;
 
 		if (!localData) {
-			await this.task(leaf, onLoaded);
+			await this.task(leaf, onFinish);
 		}
 	}
 
@@ -196,10 +196,10 @@ export class HTTPShell {
 	 * @returns {Promise<void>} ~
 	 */
 	async before(leaf: HTTPShellLeaf): Promise<void> {
-		const { onBefore } = leaf.originalRequest;
+		const { onRequest } = leaf.originalRequest;
 
 		try {			
-			await this.task(leaf, onBefore, (result: any) => {
+			await this.task(leaf, onRequest, (result: any) => {
 				let request: HTTPRequest;
 				if (result instanceof HTTPRequest) {
 					request = new HTTPRequest(result);
@@ -225,7 +225,7 @@ export class HTTPShell {
 	 * @returns {Promise<void>} ~
 	 */
 	async after(leaf: HTTPShellLeaf): Promise<void> {
-		const { localData, onAfter, provider } = leaf.request!;
+		const { localData, onResponse, provider } = leaf.request!;
 		
 		let target = localData 
 			? Promise.resolve(new HTTPResponse({ body: localData })) 
@@ -242,7 +242,7 @@ export class HTTPShell {
 		leaf.originalResponse = originalResponse;
 
 		try {
-			await this.task(leaf, onAfter, (result: any) => {
+			await this.task(leaf, onResponse, (result: any) => {
 				let response: HTTPResponse;
 				if (result instanceof HTTPResponse) {
 					response = new HTTPResponse(result);
