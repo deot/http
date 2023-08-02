@@ -20,6 +20,31 @@ describe('controller.ts', () => {
 		expect(response.body).toEqual(body);
 	});
 
+	it('baseURL/apis', async () => {
+		expect.assertions(1);
+		const baseURL = 'https://xxx.com';
+		const apis = {
+			A_GET: '/api.json'
+		};
+		const controller = new HTTPController({
+			onRequest(leaf) {
+				const request = new HTTPRequest(leaf.originalRequest);
+				if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
+					let [key, query] = request.url.split('?'); // 避免before带上?token=*之类
+					request.url = `${apis[key] ? `${baseURL}${apis[key]}` : ''}${query ? `?${query}` : ''}`;
+				}
+
+				return request;
+			},
+			async provider(request) {
+				expect(request.url).toBe(baseURL + apis['A_GET']);
+				return new HTTPResponse();
+			}
+		});
+		const body = {};
+		await controller.http('A_GET', { body });
+	});
+
 	it('error, empty url', async () => {
 		expect.assertions(6);
 
@@ -156,6 +181,23 @@ describe('controller.ts', () => {
 		expect(Object.keys(shell.leafs).length).toBe(0);
 	});
 
+	it('send, multiple', async () => {
+		let count = 0;
+		let record = count;
+		const shell = Network.custom('xxx', {
+			onStart() {
+				count++;
+			},
+			onFinish() {
+				record = count;
+			}
+		});
+		await Promise.all(Array.from({ length: 10 }).map(() => shell.send()));
+
+		expect(count).toBe(1);
+		expect(record).toBe(1);
+	});
+
 	it('localData', async () => {
 		expect.assertions(1);
 		const body = {
@@ -285,9 +327,21 @@ describe('controller.ts', () => {
 			status: 1,
 			data: {}
 		};
+
+		let startCount = 0;
+		let finishCount = 0;
+
+		let record = count;
 		const response = await Network.http('xxx', {
 			maxTries,
 			interval: 2,
+			onStart() {
+				startCount++;
+			},
+			onFinish() {
+				finishCount++;
+				record = count;
+			},
 			onRequest() {
 				count++;
 				if (count < maxTries) {
@@ -298,8 +352,12 @@ describe('controller.ts', () => {
 			}
 		});
 
-		expect(count).toBe(10);
+		expect(startCount).toBe(1);
+		expect(finishCount).toBe(1);
+		expect(record).toBe(maxTries);
+		expect(count).toBe(maxTries);
 		expect(response.body).toBe(body);
+		expect(Network.shells.length).toBe(0);
 	});
 
 	it('task/coverage', async () => {

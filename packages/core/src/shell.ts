@@ -30,6 +30,8 @@ export class HTTPShell {
 
 	leafs: Record<string, HTTPShellLeaf> = {};
 
+	isPending = false; // 用于控制多个send时，只执行一次onStart/onFinish
+
 	constructor(
 		url: string | HTTPRequest | HTTPRequestOptions, 
 		requestOptions: HTTPRequestOptions | undefined,
@@ -64,9 +66,9 @@ export class HTTPShell {
 					const { timeout } = leaf.originalRequest;
 					const races = [ajax, cancel];
 					timeout && races.push(
-						new Promise((_, reject$) => {
+						new Promise((_, reject$$) => {
 							leaf.timeout = setTimeout(
-								() => reject$(this.error(leaf, ERROR_CODE.HTTP_REQUEST_TIMEOUT)),
+								() => reject$$(this.error(leaf, ERROR_CODE.HTTP_REQUEST_TIMEOUT)),
 								timeout
 							);
 						})
@@ -75,21 +77,33 @@ export class HTTPShell {
 				})
 				.then(() => (response = (leaf.response as HTTPResponse)))
 				.catch(e => (error = e))
-				.then(() => this.clear(leaf))
 				.then(() => {
+					const onSuccess = async (e) => {
+						await this.clear(leaf);
+						resolve(e);
+					};
+
+					const onError = async (e) => {
+						await this.clear(leaf);
+						reject(e);
+					};
+
 					const isError = error || response.type === 'error';
 					// maxTries
 					const request = new HTTPRequest(this.request);
 					request.maxTries -= 1;
 					if (isError && request.maxTries >= 1) {
+						// 重试的过程中，强制清理，onStart，onFinish，确保它只执行一次
+						request.onStart = [];
+						request.onFinish = [];
 						return Promise.resolve()
 							.then(() => request.interval && new Promise(_ => setTimeout(_, request.interval)))
 							.then(() => this.parent.http(request))
-							.then(resolve)
-							.catch(reject);
+							.then(onSuccess)
+							.catch(onError);
 					}
 					
-					return isError ? reject(error || response) : resolve(response);
+					return isError ? onError(error || response) : onSuccess(response);
 				});
 		});
 
@@ -172,7 +186,8 @@ export class HTTPShell {
 	async loading(leaf: HTTPShellLeaf): Promise<void> {
 		const { localData, onStart } = leaf.originalRequest;
 
-		if (!localData) {
+		if (!localData && !this.isPending) {
+			this.isPending = true;
 			await this.task(leaf, onStart);
 		}
 	}
@@ -184,8 +199,10 @@ export class HTTPShell {
 	 */
 	async loaded(leaf: HTTPShellLeaf): Promise<void> {
 		const { localData, onFinish } = leaf.originalRequest;
+		const isOnly = Object.keys(this.leafs).length === 1;
 
-		if (!localData) {
+		if (!localData && isOnly && this.isPending) {
+			this.isPending = false;
 			await this.task(leaf, onFinish);
 		}
 	}
