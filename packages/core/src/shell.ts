@@ -15,8 +15,8 @@ export interface HTTPShellLeaf {
 	timeout: any;
 	target: Promise<HTTPResponse>;
 	originalRequest: HTTPRequest;
+	request: HTTPRequest;
 
-	request?: HTTPRequest;
 	response?: HTTPResponse;
 	originalResponse?: HTTPResponse;
 
@@ -48,7 +48,11 @@ export class HTTPShell {
 		this.parent._add(this);
 
 		const id = getUid(`shell.leaf`);
-		const leaf = { id, originalRequest: this.request } as HTTPShellLeaf;
+		const leaf = { 
+			id, 
+			originalRequest: this.request,
+			request: new HTTPRequest(this.request) 
+		} as HTTPShellLeaf;
 		this.leafs[id] = leaf;
 
 		const cancel = new Promise((_, reject) => {
@@ -117,11 +121,9 @@ export class HTTPShell {
 
 	// `@internal`
 	async task(leaf: HTTPShellLeaf, fns: HTTPHook[], done?: (e?: any) => void) {
+		if (!fns.length) return;
+
 		let needBreak = false;
-
-		// 至少要执行一次
-		if (!fns.length && done) return done();
-
 		return fns.reduce((pre, fn) => {
 			pre = pre
 				.then(() => {
@@ -221,7 +223,7 @@ export class HTTPShell {
 				if (result instanceof HTTPRequest) {
 					request = new HTTPRequest(result);
 				} else if (result === leaf) {
-					request = leaf.request || new HTTPRequest(leaf.originalRequest);
+					request = leaf.request!;
 				} else {
 					request = new HTTPRequest(leaf.originalRequest!, result);
 				}
@@ -257,6 +259,7 @@ export class HTTPShell {
 		}
 
 		leaf.originalResponse = originalResponse;
+		leaf.response = new HTTPResponse(originalResponse);
 
 		try {
 			await this.task(leaf, onResponse, (result: any) => {
@@ -264,7 +267,7 @@ export class HTTPShell {
 				if (result instanceof HTTPResponse) {
 					response = new HTTPResponse(result);
 				} else if (result === leaf) {
-					response = leaf.response || new HTTPResponse(leaf.originalResponse);
+					response = leaf.response!;
 				} else {
 					response = new HTTPResponse(leaf.originalResponse, result);
 				}
