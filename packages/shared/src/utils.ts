@@ -1,15 +1,14 @@
-import type { Options } from './global.types';
-
-export const autoCatch = async (impl: any, options: Options = {}) => { 
-	const { onError = console.error } = options;
-
-	let target = impl;
-	typeof target === 'function' && (target = target());
-
-	try {
-		const e = await target;
-		return e;
-	} catch (e) {
-		onError(e);
+export const stringifySafely = (rawValue: string, parser, encoder) => {
+	if (typeof rawValue === 'string') {
+		try {
+			(parser || JSON.parse)(rawValue);
+			return rawValue.trim();
+		} catch (e: any) {
+			if (e.name !== 'SyntaxError') {
+				throw e;
+			}
+		}
 	}
+
+	return (encoder || JSON.stringify)(rawValue);
 };
