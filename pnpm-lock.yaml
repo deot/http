@@ -20,6 +20,8 @@ importers:
 
   packages/core: {}
 
+  packages/hooks: {}
+
   packages/index:
     dependencies:
       '@deot/http-shared':
