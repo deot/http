@@ -3,7 +3,3 @@
  */
 
 export * from './global.types';
-import * as Is from './is';
-import * as Utils from './utils';
-
-export { Utils, Is };
