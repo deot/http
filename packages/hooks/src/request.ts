@@ -2,8 +2,8 @@
 import type { HTTPHook } from '@deot/http-core';
 import { Is, Utils } from './helper';
 
-const JContentType = 'application/json';
-const XContentType = 'application/x-www-form-urlencoded';
+const JContentType = 'application/json'; // ['json']
+const XContentType = 'application/x-www-form-urlencoded'; // ['urlencoded', 'form', 'form-data']
 const MContentType = `multipart/form-data`;
 
 /**

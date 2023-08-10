@@ -27,7 +27,11 @@ export const provider: HTTPProvider = (request, leaf) => {
 			) return;
 
 			if (xhr.status >= 200 && xhr.status < 300) {
-				onSuccess(xhr.responseText || xhr.response);
+				onSuccess(
+					typeof xhr.responseType === 'undefined'
+						? xhr.responseText
+						: xhr.response
+				);
 			} else {
 				onError(ERROR_CODE.HTTP_STATUS_ERROR);
 			}

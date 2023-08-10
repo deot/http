@@ -3,7 +3,7 @@ import { HTTPRequest, HTTPResponse, HTTPShellLeaf, ERROR_CODE } from "@deot/http
 
 export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf) => {
 	return new Promise((resolve, reject) => {
-		const { url, headers, body, credentials, method, timeout, ...fetchOptions } = request;
+		const { url, headers, body, credentials, method, timeout, responseType, ...fetchOptions } = request;
 
 		const controller = new AbortController();
 
@@ -40,15 +40,17 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			...fetchOptions
 		}).then((res) => {
 			if (res.status >= 200 && res.status < 300) {
-				res.text()
-					.then(data => {
+				let fn = res[responseType || 'text'];
+				if (!fn) return onSuccess(res);
+				fn()
+					.then((data: any) => {
 						onSuccess(data);
 					})
-					.catch(error => {
+					.catch((error: any) => {
 						onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED, error);
 					});
 			} else {
-				onError(ERROR_CODE.HTTP_STATUS_ERROR);
+				onError(ERROR_CODE.HTTP_STATUS_ERROR, res);
 			}
 			return res;
 		}).catch((e) => {
