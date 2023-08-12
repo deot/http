@@ -1,9 +1,9 @@
-import { createHttpClient } from '@deot/http-client';
+import { createHTTPClient } from '@deot/http-client';
 import * as Server from './fixtures/server';
 
 describe('index.ts', async () => {
 	const serverUrl = await Server.impl();
-	const Network = createHttpClient({
+	const Network = createHTTPClient({
 		credentials: 'omit'
 	});
 
