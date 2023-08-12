@@ -58,11 +58,11 @@ export const provider: HTTPProvider = (request, leaf) => {
 
 		// rebuild cancel
 		const originalCancel = leaf.cancel!;
-		leaf.cancel = () => {
-			originalCancel();
+		leaf.cancel = async () => {
 			xhr.abort();
+			await originalCancel();
 		};
 
-		leaf.xhr = xhr;
+		leaf.server = xhr;
 	});
 };

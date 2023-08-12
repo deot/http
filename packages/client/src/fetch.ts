@@ -60,11 +60,11 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 
 		// rebuild cancel
 		const originalCancel = leaf.cancel!;
-		leaf.cancel = () => {
-			originalCancel();
+		leaf.cancel = async () => {
 			controller.abort();
+			await originalCancel();
 		};
 
-		leaf.fetch = fetch$;
+		leaf.server = fetch$;
 	});
 };
