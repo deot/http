@@ -5,24 +5,10 @@ import type { HTTPController } from "./controller";
 
 import { HTTPRequest } from "./request";
 import { HTTPResponse } from "./response";
+import { HTTPShellLeaf } from "./shell-leaf";
 import { ERROR_CODE } from './error';
-import { getUid } from './utils';
 import type { HTTPRequestOptions, HTTPHook } from "./request";
 
-export interface HTTPShellLeaf {
-	id: string;
-	cancel: () => void; 
-	timeout: any;
-	target: Promise<HTTPResponse>;
-	originalRequest: HTTPRequest;
-	request: HTTPRequest;
-
-	response?: HTTPResponse;
-	originalResponse?: HTTPResponse;
-
-	// 让provider可以设值
-	[key: string]: any;
-}
 export class HTTPShell {
 	parent: HTTPController;
 
@@ -42,21 +28,19 @@ export class HTTPShell {
 	}
 
 	// 发起请求
-	send(returnLeaf: true): HTTPShellLeaf;
-	send(getLeaf?: (leaf: HTTPShellLeaf) => void): Promise<HTTPResponse>;
-	send(value?: ((leaf: HTTPShellLeaf) => void)| boolean) {
+	send(): HTTPShellLeaf {
 		this.parent._add(this);
 
-		const id = getUid(`shell.leaf`);
-		const leaf = { 
-			id, 
-			originalRequest: this.request,
-			request: new HTTPRequest(this.request) 
-		} as HTTPShellLeaf;
-		this.leafs[id] = leaf;
+		const leaf = new HTTPShellLeaf(this.request);
+		this.leafs[leaf.id] = leaf;
 
 		const cancel = new Promise((_, reject) => {
-			leaf.cancel = () => reject(this.error(leaf, ERROR_CODE.HTTP_CANCEL));
+			leaf.cancel = async () => {
+				reject(this.error(leaf, ERROR_CODE.HTTP_CANCEL));
+				await new Promise<void>(resolve => { 
+					leaf.target.catch(() => {}).finally(resolve);
+				});
+			};
 		});
 
 		let error: HTTPResponse;
@@ -82,14 +66,12 @@ export class HTTPShell {
 				.then(() => (response = (leaf.response as HTTPResponse)))
 				.catch(e => (error = e))
 				.then(() => {
-					const onSuccess = async (e) => {
-						await this.clear(leaf);
-						resolve(e);
+					const onSuccess = (e: HTTPResponse) => {
+						this.clear(leaf).then(() => resolve(e));
 					};
 
-					const onError = async (e) => {
-						await this.clear(leaf);
-						reject(e);
+					const onError = async (e: HTTPResponse) => {
+						this.clear(leaf).then(() => reject(e));
 					};
 
 					const isError = error || response.type === 'error';
@@ -112,11 +94,7 @@ export class HTTPShell {
 		});
 
 		leaf.target = target;
-
-		typeof value === 'function' && value(leaf);
-		return typeof value !== 'function' && value
-			? leaf 
-			: target;
+		return leaf;
 	}
 
 	// `@internal`
@@ -128,7 +106,9 @@ export class HTTPShell {
 			pre = pre
 				.then(() => {
 					if (!needBreak) {
-						return fn(leaf);
+						let result = fn(leaf);
+						// leaf含then方法是基于leaf.target 所以不能直接返回leaf
+						return result === leaf || result;
 					}
 					return false;
 				}).then((e) => {
@@ -166,11 +146,8 @@ export class HTTPShell {
 	async cancel(id?: string | HTTPShellLeaf): Promise<void> {
 		if (id) {
 			const leaf = typeof id === 'string' ? this.leafs[id] : id;
-			if (leaf?.cancel && leaf?.target) {
-				leaf.cancel();
-				await new Promise<void>(resolve => { 
-					leaf.target.catch(() => {}).finally(resolve);
-				});
+			if (leaf?.cancel) {
+				await leaf.cancel();
 			}
 		} else {
 			await Object.keys(this.leafs).reduce((pre, id$) => {
@@ -222,7 +199,7 @@ export class HTTPShell {
 				let request: HTTPRequest;
 				if (result instanceof HTTPRequest) {
 					request = new HTTPRequest(result);
-				} else if (result === leaf) {
+				} else if (result === true) {
 					request = leaf.request!;
 				} else {
 					request = new HTTPRequest(leaf.originalRequest!, result);
@@ -266,7 +243,7 @@ export class HTTPShell {
 				let response: HTTPResponse;
 				if (result instanceof HTTPResponse) {
 					response = new HTTPResponse(result);
-				} else if (result === leaf) {
+				} else if (result === true) {
 					response = leaf.response!;
 				} else {
 					response = new HTTPResponse(leaf.originalResponse, result);

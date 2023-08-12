@@ -37,6 +37,16 @@ await Network.http({
 	url: `A_GET`,
 	body: {}
 });
+
+// cancel 1
+const leaf = Network.http(`A_GET`);
+await leaf.cancel();
+
+// cancel 2
+const shell = Network.custom(`A_GET`);
+shell.send();
+
+await shell.cancel();
 ```
 
 - [HttpRequestOptions](./src/request.ts)

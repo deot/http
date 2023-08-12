@@ -105,12 +105,31 @@ describe('controller.ts', () => {
 		expect(response.body).toEqual(null);
 	});
 
-	it('cancel', async () => {
-		expect.assertions(10);
+	it('cancel by leaf', async () => {
+		expect.assertions(9);
+		const leaf = Network.http('xxx');
+		leaf.catch((e) => {
+			expect(e.body).toBe(null);
+			expect(e.status).toBe(0);
+			expect(e.ok).toBe(false);
+			expect(e.type).toBe('error');
+			expect(e.statusText).toBe('HTTP_CANCEL');
+		});
+
+		expect(Network.shells.length).toBe(1);
+		const shell = Network.shells[0];
+		expect(Object.keys(shell.leafs).length).toBe(1);
+
+		await leaf.cancel();
+
+		expect(Network.shells.length).toBe(0);
+		expect(Object.keys(shell.leafs).length).toBe(0);
+	});
+
+	it('cancel by shell', async () => {
+		expect.assertions(9);
 		const shell = Network.custom('xxx');
-		shell.send((leaf) => {
-			expect(typeof leaf.id).toBe('string');
-		}).catch((e) => {
+		shell.send().catch((e) => {
 			expect(e.body).toBe(null);
 			expect(e.status).toBe(0);
 			expect(e.ok).toBe(false);
@@ -167,12 +186,12 @@ describe('controller.ts', () => {
 		expect(Object.keys(shell.leafs).length).toBe(0);
 	});
 
-	it('send, get leaf', async () => {
+	it('send, leaf', async () => {
 		expect.assertions(3);
 		const shell = Network.custom('xxx');
-		const leaf = shell.send(true);
+		const leaf = shell.send();
 
-		leaf.target.catch((e) => {
+		leaf.catch((e) => {
 			expect(e.statusText).toBe('HTTP_CANCEL');
 		});
 		
@@ -403,5 +422,18 @@ describe('controller.ts', () => {
 		});
 
 		expect(count).toBe(4);
+	});
+
+	it('leaf/finally', async () => {
+		let count = 0;
+		const body = {
+			status: 1,
+			data: {}
+		};
+		await Network.http('xxx', { localData: body }).finally(() => {
+			count++;
+		});
+
+		expect(count).toBe(1);
 	});
 });

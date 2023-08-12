@@ -1,9 +1,8 @@
 import type { HTTPRequestOptions } from "./request";
-import type { HTTPResponse } from "./response";
 import { HTTPRequest } from "./request";
 
 import { HTTPShell } from "./shell";
-import type { HTTPShellLeaf } from "./shell";
+import type { HTTPShellLeaf } from "./shell-leaf";
 
 export class HTTPController {
 	request: HTTPRequest;
@@ -20,12 +19,12 @@ export class HTTPController {
 	 * 发起一个请求，返回Promise<HttpResponse>
 	 * @param {string|HTTPRequest|HTTPRequestOptions} url ~
 	 * @param {HTTPRequestOptions} requestOptions ~
-	 * @returns {Promise<HTTPResponse>} ~
+	 * @returns {HTTPShellLeaf} ~
 	 */
 	http(
 		url: string | HTTPRequest | HTTPRequestOptions, 
 		requestOptions?: HTTPRequestOptions,
-	): Promise<HTTPResponse> {
+	): HTTPShellLeaf {
 		const shell = new HTTPShell(url, requestOptions, this);
 
 		return shell.send();
