@@ -202,7 +202,7 @@ export class HTTPShell<T = any> {
 				} else if (result === true) {
 					request = leaf.request!;
 				} else {
-					request = new HTTPRequest(leaf.originalRequest!, result);
+					request = new HTTPRequest(leaf.request!, result);
 				}
 				leaf.request = request;
 			});
@@ -246,7 +246,7 @@ export class HTTPShell<T = any> {
 				} else if (result === true) {
 					response = leaf.response!;
 				} else {
-					response = new HTTPResponse<T>(leaf.originalResponse, result);
+					response = new HTTPResponse<T>(leaf.response, result);
 				}
 
 				leaf.response = response;
