@@ -72,6 +72,12 @@ const createServer = async (port: number, host: string) => {
 					});
 				}
 
+				if (req.url!.includes('jsonp')) {
+					const key = req.url!.split('/').pop();
+					res.end(`window['${key}']({})`);
+					return;
+				}
+
 				let { 
 					delay = 0.1, 
 					response = JSON.stringify({ 
@@ -99,9 +105,10 @@ export const impl = async () => {
 	});
 
 	afterAll(async () => {
-		return new Promise((resolve) => {
+		await new Promise<void>((resolve) => {
 			if (!server) {
 				resolve();
+				return;
 			}
 			server.close(() => {
 				setTimeout(resolve, 100);

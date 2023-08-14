@@ -6,15 +6,16 @@ export const provider: HTTPProvider = (request: HTTPRequest) => {
 		const { jsonp, url } = request;
 		if (typeof jsonp !== 'string' || window[jsonp]) {
 			reject(HTTPResponse.error(ERROR_CODE.HTTP_CODE_ILLEGAL));
+			return;
 		}
 
 		Object.defineProperty(window, jsonp, {
-			value: (body) => resolve(new HTTPResponse({ body }))
+			value: (body: any) => resolve(new HTTPResponse({ body }))
 		});
 
 		let script = document.createElement("script");
 		let head = document.getElementsByTagName("head")[0];
-		
+
 		script.src = url;
 		head.appendChild(script);
 	});
