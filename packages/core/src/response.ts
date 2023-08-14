@@ -16,13 +16,13 @@ export interface HTTPResponseOptions {
 	ok?: boolean;
 }
 
-export class HTTPResponse {
+export class HTTPResponse<T = Record<string, any> | BodyInit | null> {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
 	// From Response
 	url!: string;
-	body!: Record<string, any> | BodyInit | null; // ReadableStream | Blob | BufferSource | FormData | URLSearchParams | string
+	body!: T; // ReadableStream | Blob | BufferSource | FormData | URLSearchParams | string
 	headers!: HeadersInit;
 	status!: number;
 	statusText!: string;
@@ -34,7 +34,7 @@ export class HTTPResponse {
 	// Custom
 
 	constructor(
-		body?: BodyInit | null | HTTPResponse | HTTPResponseOptions, 
+		body?: BodyInit | null | HTTPResponse<T> | HTTPResponseOptions, 
 		options?: HTTPResponseOptions
 	) {
 		const defaults = {
@@ -51,7 +51,7 @@ export class HTTPResponse {
 
 		const isBodyAsOptions = body && (body.constructor === Object || body instanceof HTTPResponse);
 		const kv = isBodyAsOptions 
-			? { ...defaults, ...(body as (HTTPResponse | HTTPResponseOptions)), ...options } 
+			? { ...defaults, ...(body as (HTTPResponse<T> | HTTPResponseOptions)), ...options } 
 			: { ...defaults, body, ...options };
 
 		Object.keys(kv).forEach((key) => {

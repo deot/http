@@ -2,8 +2,8 @@ import { getUid } from './utils';
 import { HTTPRequest } from "./request";
 import type { HTTPResponse } from "./response";
 
-type PromiseHook = (response: HTTPResponse) => any;
-export class HTTPShellLeaf {
+type PromiseHook<T> = (response: HTTPResponse<T>) => any;
+export class HTTPShellLeaf<T = any> {
 	id = getUid(`shell.leaf`);
 
 	cancel!: () => Promise<void>;
@@ -13,7 +13,7 @@ export class HTTPShellLeaf {
 	/**
 	 * 当前请求的Promise
 	 */
-	target!: Promise<HTTPResponse>;
+	target!: Promise<HTTPResponse<T>>;
 
 	/**
 	 * 未onRequest的值
@@ -23,7 +23,7 @@ export class HTTPShellLeaf {
 	/**
 	 * 未onResponse的值，默认: undefined
 	 */
-	originalResponse?: HTTPResponse;
+	originalResponse?: HTTPResponse<T>;
 
 	/**
 	 * onRequest后的值, 默认: originalRequest
@@ -33,7 +33,7 @@ export class HTTPShellLeaf {
 	/**
 	 * onResponse后的值，默认: undefined
 	 */
-	response?: HTTPResponse;
+	response?: HTTPResponse<T>;
 
 	// 让provider可以设值
 	[key: string]: any;
@@ -43,11 +43,11 @@ export class HTTPShellLeaf {
 		this.request = new HTTPRequest(request);
 	}
 
-	then(resolve: PromiseHook, reject: PromiseHook) {
+	then(resolve: PromiseHook<T>, reject: PromiseHook<T>) {
 		return this.target.then(resolve, reject);
 	}
 
-	catch(callback?: PromiseHook) {
+	catch(callback?: PromiseHook<T>) {
 		return this.target.catch(callback);
 	}
 

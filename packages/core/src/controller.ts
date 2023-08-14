@@ -21,11 +21,11 @@ export class HTTPController {
 	 * @param {HTTPRequestOptions} requestOptions ~
 	 * @returns {HTTPShellLeaf} ~
 	 */
-	http(
+	http<T = any>(
 		url: string | HTTPRequest | HTTPRequestOptions, 
 		requestOptions?: HTTPRequestOptions,
-	): HTTPShellLeaf {
-		const shell = new HTTPShell(url, requestOptions, this);
+	): HTTPShellLeaf<T> {
+		const shell = new HTTPShell<T>(url, requestOptions, this);
 
 		return shell.send();
 	}
@@ -36,11 +36,11 @@ export class HTTPController {
 	 * @param {HTTPRequestOptions} requestOptions ~
 	 * @returns {HTTPShell} ~
 	 */
-	custom(
+	custom<T = any>(
 		url: string | HTTPRequest | HTTPRequestOptions, 
 		requestOptions?: HTTPRequestOptions,
-	): HTTPShell {
-		const shell = new HTTPShell(url, requestOptions, this);
+	): HTTPShell<T> {
+		const shell = new HTTPShell<T>(url, requestOptions, this);
 
 		return shell;
 	}

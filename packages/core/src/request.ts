@@ -1,5 +1,5 @@
 /* eslint-disable lines-between-class-members */
-import type { HTTPShellLeaf } from './shell';
+import type { HTTPShellLeaf } from './shell-leaf';
 import type { HTTPProvider } from './provider';
 import { HTTPResponse } from './response';
 

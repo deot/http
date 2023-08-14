@@ -9,12 +9,12 @@ import { HTTPShellLeaf } from "./shell-leaf";
 import { ERROR_CODE } from './error';
 import type { HTTPRequestOptions, HTTPHook } from "./request";
 
-export class HTTPShell {
+export class HTTPShell<T = any> {
 	parent: HTTPController;
 
 	request: HTTPRequest;
 
-	leafs: Record<string, HTTPShellLeaf> = {};
+	leafs: Record<string, HTTPShellLeaf<T>> = {};
 
 	isPending = false; // 用于控制多个send时，只执行一次onStart/onFinish
 
@@ -28,10 +28,10 @@ export class HTTPShell {
 	}
 
 	// 发起请求
-	send(): HTTPShellLeaf {
+	send(): HTTPShellLeaf<T> {
 		this.parent._add(this);
 
-		const leaf = new HTTPShellLeaf(this.request);
+		const leaf = new HTTPShellLeaf<T>(this.request);
 		this.leafs[leaf.id] = leaf;
 
 		const cancel = new Promise((_, reject) => {
@@ -43,9 +43,9 @@ export class HTTPShell {
 			};
 		});
 
-		let error: HTTPResponse;
-		let response: HTTPResponse;
-		const target = new Promise<HTTPResponse>((resolve, reject) => {
+		let error: HTTPResponse<T>;
+		let response: HTTPResponse<T>;
+		const target = new Promise<HTTPResponse<T>>((resolve, reject) => {
 			Promise.resolve()
 				.then(() => this.loading(leaf))
 				.then(() => this.before(leaf))
@@ -63,14 +63,14 @@ export class HTTPShell {
 					);
 					return Promise.race(races);
 				})
-				.then(() => (response = (leaf.response as HTTPResponse)))
+				.then(() => (response = (leaf.response as HTTPResponse<T>)))
 				.catch(e => (error = e))
 				.then(() => {
-					const onSuccess = (e: HTTPResponse) => {
+					const onSuccess = (e: HTTPResponse<T>) => {
 						this.clear(leaf).then(() => resolve(e));
 					};
 
-					const onError = async (e: HTTPResponse) => {
+					const onError = async (e: HTTPResponse<T>) => {
 						this.clear(leaf).then(() => reject(e));
 					};
 
@@ -98,7 +98,7 @@ export class HTTPShell {
 	}
 
 	// `@internal`
-	async task(leaf: HTTPShellLeaf, fns: HTTPHook[], done?: (e?: any) => void) {
+	async task(leaf: HTTPShellLeaf<T>, fns: HTTPHook[], done?: (e?: any) => void) {
 		if (!fns.length) return;
 
 		let needBreak = false;
@@ -122,7 +122,7 @@ export class HTTPShell {
 	}
 
 	// `@internal`
-	async clear(leaf: HTTPShellLeaf): Promise<void> {
+	async clear(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { timeout, id } = leaf;
 		timeout && clearTimeout(timeout);
 
@@ -143,7 +143,7 @@ export class HTTPShell {
 	 * @param {string|HTTPShellLeaf} id 当前请求或当前请求id
 	 * @returns {Promise<void>} ~
 	 */
-	async cancel(id?: string | HTTPShellLeaf): Promise<void> {
+	async cancel(id?: string | HTTPShellLeaf<T>): Promise<void> {
 		if (id) {
 			const leaf = typeof id === 'string' ? this.leafs[id] : id;
 			if (leaf?.cancel) {
@@ -162,7 +162,7 @@ export class HTTPShell {
 	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async loading(leaf: HTTPShellLeaf): Promise<void> {
+	async loading(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { localData, onStart } = leaf.originalRequest;
 
 		if (!localData && !this.isPending) {
@@ -176,7 +176,7 @@ export class HTTPShell {
 	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async loaded(leaf: HTTPShellLeaf): Promise<void> {
+	async loaded(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { localData, onFinish } = leaf.originalRequest;
 		const isOnly = Object.keys(this.leafs).length === 1;
 
@@ -191,7 +191,7 @@ export class HTTPShell {
 	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async before(leaf: HTTPShellLeaf): Promise<void> {
+	async before(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { onRequest } = leaf.originalRequest;
 
 		try {			
@@ -220,33 +220,33 @@ export class HTTPShell {
 	 * @param {HTTPShellLeaf} leaf 当前请求
 	 * @returns {Promise<void>} ~
 	 */
-	async after(leaf: HTTPShellLeaf): Promise<void> {
+	async after(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { localData, onResponse, provider } = leaf.request!;
 		
 		let target = localData 
 			? Promise.resolve(new HTTPResponse({ body: localData })) 
 			: provider(leaf.request!, leaf);
 		
-		let originalResponse: HTTPResponse;
+		let originalResponse: HTTPResponse<T>;
 
 		try {
-			originalResponse = await target;
+			originalResponse = (await target) as HTTPResponse<T>;
 		} catch (e) {
-			originalResponse = e as HTTPResponse;
+			originalResponse = e as HTTPResponse<T>;
 		}
 
 		leaf.originalResponse = originalResponse;
-		leaf.response = new HTTPResponse(originalResponse);
+		leaf.response = new HTTPResponse<T>(originalResponse);
 
 		try {
 			await this.task(leaf, onResponse, (result: any) => {
-				let response: HTTPResponse;
+				let response: HTTPResponse<T>;
 				if (result instanceof HTTPResponse) {
-					response = new HTTPResponse(result);
+					response = new HTTPResponse<T>(result);
 				} else if (result === true) {
 					response = leaf.response!;
 				} else {
-					response = new HTTPResponse(leaf.originalResponse, result);
+					response = new HTTPResponse<T>(leaf.originalResponse, result);
 				}
 
 				leaf.response = response;
@@ -263,7 +263,7 @@ export class HTTPShell {
 	 * @param {any} body exception
 	 * @returns {HTTPResponse} ~
 	 */
-	error(leaf: HTTPShellLeaf, statusText: string, body?: any): HTTPResponse {
+	error(leaf: HTTPShellLeaf<T>, statusText: string, body?: any): HTTPResponse {
 		return HTTPResponse.error(statusText, {
 			body,
 			[`@@internal`]: {
