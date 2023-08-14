@@ -42,11 +42,12 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			if (res.status >= 200 && res.status < 300) {
 				let fn = res[responseType || 'text'];
 				if (!fn) return onSuccess(res);
-				fn()
+				fn.call(res)
 					.then((data: any) => {
 						onSuccess(data);
 					})
 					.catch((error: any) => {
+						console.log(error);
 						onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED, error);
 					});
 			} else {
