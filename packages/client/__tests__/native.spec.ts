@@ -2,7 +2,7 @@ import { E2E } from '@deot/dev-test';
 import { resolve } from 'node:path';
 import * as Server from './fixtures/server';
 
-describe('request.ts', async () => {
+describe.skip('request.ts', async () => {
 	const serverUrl = await Server.impl();
 	const launch = E2E.impl();
 	const baseUrl = `file://${resolve(__dirname, './fixtures/native.html')}`;

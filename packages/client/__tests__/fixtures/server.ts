@@ -31,7 +31,7 @@ const createServer = async (port: number, host: string) => {
 				
 				let body = {};
 
-				if (req.method === 'POST') {
+				if (req.method === 'POST' || req.method === 'DELETE' || req.method === 'PUT') {
 					body = await new Promise((resolve$) => {
 						if (req.headers['formidable'] || req.headers['content-type']?.includes('multipart/form-data')) {
 							const form = formidable();
@@ -75,8 +75,6 @@ const createServer = async (port: number, host: string) => {
 				let { 
 					delay = 0.1, 
 					response = JSON.stringify({ 
-						user: 'Deot', 
-						login: 'deot', 
 						method: req.method, 
 						url: req.url,
 						reuqest: body
@@ -102,7 +100,12 @@ export const impl = async () => {
 
 	afterAll(async () => {
 		return new Promise((resolve) => {
-			server.close(resolve);
+			if (!server) {
+				resolve();
+			}
+			server.close(() => {
+				setTimeout(resolve, 100);
+			});
 		});
 	});
 
