@@ -10,7 +10,6 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 		let timer = timeout 
 			? setTimeout(() => {
 				controller.abort();
-				timer = null;
 				onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
 			}, timeout)
 			: null;
@@ -18,11 +17,13 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 		const onError = (statusText: string, body$?: any) => {
 			reject(HTTPResponse.error(statusText, body$));
 			timer && clearTimeout(timer);
+			timer = null;
 		};
 
 		const onSuccess = (body$: any) => {
 			resolve(new HTTPResponse({ body: body$ }));
 			timer && clearTimeout(timer);
+			timer = null;
 		};
 
 
@@ -47,7 +48,6 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 						onSuccess(data);
 					})
 					.catch((error: any) => {
-						console.log(error);
 						onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED, error);
 					});
 			} else {
@@ -56,7 +56,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			return res;
 		}).catch((e) => {
 			onError(ERROR_CODE.HTTP_STATUS_ERROR, e);
-			return Promise.reject(e);
+			// no throw again, avoid unhandled error 
 		});
 
 		// rebuild cancel

@@ -65,8 +65,8 @@ export class HTTPResponse<T = Record<string, any> | BodyInit | null> {
 	static error(statusText?: string, options?: HTTPResponseOptions) {
 		return new HTTPResponse(null, {
 			...options,
+			status: options?.status || 0,
 			type: 'error',
-			status: 0,
 			ok: false,
 			statusText
 		});

@@ -7,8 +7,8 @@ export const provider: HTTPProvider = (request, leaf) => {
 
 		let xhr = new XMLHttpRequest();
 
-		const onError = (statusText: string) => {
-			reject(HTTPResponse.error(statusText));
+		const onError = (statusText: string, body$?: any) => {
+			reject(HTTPResponse.error(statusText, body$));
 		};
 
 		const onSuccess = (body$: any) => {
@@ -27,23 +27,26 @@ export const provider: HTTPProvider = (request, leaf) => {
 			) return;
 
 			if (xhr.status >= 200 && xhr.status < 300) {
-				onSuccess(
-					typeof xhr.responseType === 'undefined'
-						? xhr.responseText
-						: xhr.response
-				);
+				const response = !xhr.responseType 
+					? xhr.responseText 
+					: xhr.response;
+
+				xhr.responseType && response === null 
+					? onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED, xhr) 
+					: onSuccess(response);
 			} else {
-				onError(ERROR_CODE.HTTP_STATUS_ERROR);
+				onError(ERROR_CODE.HTTP_STATUS_ERROR, xhr);
 			}
 		});
 
-		on('abort', () => onError(ERROR_CODE.HTTP_CANCEL));
-		on('error', () => onError(ERROR_CODE.HTTP_STATUS_ERROR));
-		on('timeout', () => onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT));
+		on('abort', (e: any) => onError(ERROR_CODE.HTTP_CANCEL, e));
+		on('error', /* istanbul ignore next */ (e: any) => onError(ERROR_CODE.HTTP_STATUS_ERROR, e)); // 当请求了不存在地址
+		on('timeout', (e: any) => onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT, e));
 		on('progress', onDownloadProgress);
 		on('progress', onUploadProgress, xhr.upload);
 
 		xhr.open(method, url, async);
+		/* istanbul ignore next -- @preserve */
 		xhr.withCredentials = credentials === 'omit' ? false : !!credentials;
 		timeout && (xhr.timeout = timeout);
 		responseType && (xhr.responseType = responseType); 

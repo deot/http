@@ -16,6 +16,26 @@ const createServer = async (port: number, host: string) => {
 
 				if (req.method === 'OPTIONS') {
 					res.writeHead(204); // No Content
+					res.end();
+					return;
+				}
+
+				if (req.url!.includes('500')) {
+					res.writeHead(500);
+					res.end();
+					return;
+				}
+
+				if (req.url!.includes('404')) {
+					res.writeHead(404);
+					res.end();
+					return;
+				}
+
+				if (req.url!.includes('jsonp')) {
+					const key = req.url!.split('/').pop();
+					res.end(`window['${key}']({})`);
+					return;
 				}
 
 				// 也可以用searchParams
@@ -72,12 +92,6 @@ const createServer = async (port: number, host: string) => {
 					});
 				}
 
-				if (req.url!.includes('jsonp')) {
-					const key = req.url!.split('/').pop();
-					res.end(`window['${key}']({})`);
-					return;
-				}
-
 				let { 
 					delay = 0.1, 
 					response = JSON.stringify({ 
@@ -97,6 +111,8 @@ const createServer = async (port: number, host: string) => {
 	});
 };
 export const impl = async () => {
+	// 并发时创建服务时间不同
+	await new Promise(_ => { setTimeout(_, Math.random() * 300); });
 	const { port, host, baseUrl } = await Server.available();
 
 	let server: any;
@@ -106,13 +122,7 @@ export const impl = async () => {
 
 	afterAll(async () => {
 		await new Promise<void>((resolve) => {
-			if (!server) {
-				resolve();
-				return;
-			}
-			server.close(() => {
-				setTimeout(resolve, 100);
-			});
+			server.close(resolve);
 		});
 	});
 
