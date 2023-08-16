@@ -3,3 +3,5 @@
  */
 
 export * from './global.types';
+
+export const Utils = {};

@@ -18,6 +18,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@deot/http-core": "*",
+    "@deot/http-hooks": "*"
+  },
   "devDependencies": {
     "formidable": "^3.5.0"
   }

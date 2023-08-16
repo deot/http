@@ -6,6 +6,10 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "browser": {
+        "import": "./dist/index.browser.es.js",
+        "require": "./dist/index.browser.cjs.js"
+      },
       "import": "./dist/index.es.js",
       "require": "./dist/index.cjs.js",
       "types": "./dist/index.d.ts"
@@ -19,6 +23,10 @@
     "access": "public"
   },
   "dependencies": {
-  	"@deot/http-shared": "*"
+    "@deot/http-client": "*",
+    "@deot/http-server": "*"
+  },
+  "devDependencies": {
+    "@deot/http-core": "*"
   }
 }

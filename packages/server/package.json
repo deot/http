@@ -19,6 +19,8 @@
     "access": "public"
   },
   "dependencies": {
+    "@deot/http-core": "*",
+    "@deot/http-hooks": "*",
     "follow-redirects": "^1.15.2"
   }
 }

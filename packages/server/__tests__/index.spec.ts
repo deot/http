@@ -1,17 +1,17 @@
-import { createHTTPServer } from '@deot/http-server';
+import { createInstance } from '@deot/http-server';
 
 describe('index.ts', async () => {
-	const Network1 = createHTTPServer({
+	const Network1 = createInstance({
 		onRequest: [() => {}, () => {}],
 		onResponse: [() => {}, () => {}]
 	});
 
-	const Network2 = createHTTPServer({
+	const Network2 = createInstance({
 		onRequest: () => {},
 		onResponse: () => {}
 	});
 
-	const Network3 = createHTTPServer();
+	const Network3 = createInstance();
 
 	it('length', async () => {
 		expect(Network1.request.onRequest.length).toBe(3);

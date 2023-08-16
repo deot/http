@@ -1,10 +1,10 @@
 import { Readable } from 'node:stream';
-import { createHTTPServer } from '@deot/http-server';
+import { createInstance } from '@deot/http-server';
 import * as Server from '../../client/__tests__/fixtures/server';
 
 describe('server.ts', async () => {
 	const serverUrl = await Server.impl();
-	const Network = createHTTPServer({
+	const Network = createInstance({
 		credentials: 'omit'
 	});
 

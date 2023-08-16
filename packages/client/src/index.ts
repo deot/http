@@ -3,7 +3,7 @@ import type { HTTPRequestOptions } from "@deot/http-core";
 import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
 import { provider } from "./provider";
 
-export const createHTTPClient = (options: HTTPRequestOptions = {}) => {
+export const createInstance = (options: HTTPRequestOptions = {}) => {
 	const onBaseRequest = (Array.isArray(options.onRequest) ? options.onRequest : (options.onRequest ? [options.onRequest] : []));
 	const onBaseResponse = (Array.isArray(options.onResponse) ? options.onResponse : (options.onResponse ? [options.onResponse] : []));
 	const client = new HTTPController({
@@ -16,4 +16,4 @@ export const createHTTPClient = (options: HTTPRequestOptions = {}) => {
 	return client;
 };
 
-export const Network = createHTTPClient({} as HTTPRequestOptions);
+export const Network = createInstance({} as HTTPRequestOptions);
