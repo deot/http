@@ -1,7 +1,7 @@
-import http from 'node:http';
-import https from 'node:https';
-import url from 'node:url';
-import zlib from 'node:zlib';
+import * as http from 'node:http';
+import * as https from 'node:https';
+import * as url from 'node:url';
+
 import { http as httpFollow, https as httpsFollow } from 'follow-redirects';
 
 import type { HTTPProvider } from "@deot/http-core";
@@ -9,18 +9,36 @@ import { HTTPResponse, ERROR_CODE } from "@deot/http-core";
 
 export const provider: HTTPProvider = (request, leaf) => {
 	return new Promise((resolve, reject) => {
+		let timer: any;
 		const onError = (statusText: string, body$?: any) => {
+			if (body$) {
+				body$.status = body$.statusCode;
+			}
 			reject(HTTPResponse.error(statusText, body$));
+			timer && clearTimeout(timer);
+			timer = null;
 		};
 
 		const onSuccess = (body$: any) => {
 			resolve(new HTTPResponse({ body: body$ }));
+			timer && clearTimeout(timer);
+			timer = null;
 		};
 
-		const { maxRedirects, url: url$, responseType, maxContentLength, body } = request;
-		const { protocol = 'http:' } = url.parse(url$);
+		const { 
+			url: url$,
+			maxRedirects, 
+			responseType, 
+			maxContentLength, 
+			body, 
+			method, 
+			headers,
+			timeout,
+			...requestOptions
+		} = request;
+		const { protocol, port, hostname } = url.parse(url$);
 
-		let transport: any;
+		let transport: typeof http | typeof https;
 
 		const isHttps = protocol === 'https:';
 		// 是否重定向
@@ -29,69 +47,79 @@ export const provider: HTTPProvider = (request, leaf) => {
 		} else {
 			transport = isHttps ? httpsFollow : httpFollow;
 		}
-		
-		let ctx = transport.request(request, (res) => {
-			if (ctx.aborted) return;
-			if (res.statusCode >= 200 && res.statusCode < 300) {
-				let stream = res;
 
-				switch (res.headers['content-encoding']) {
-					case 'gzip':
-					case 'compress':
-					case 'deflate':
-						stream = stream.pipe(zlib.createUnzip());
-						delete res.headers['content-encoding'];
-						break;
-					default:
-						break;
-				}
-
-				if (responseType === 'stream') {
-					onSuccess(stream);
-				} else {
-					let responseBuffer: any[] = [];
-					stream.on('data', (chunk) => {
-						responseBuffer.push(chunk);
-
-						// 如果指定，请确保内容长度不超过maxContentLength
-						if (
-							maxContentLength > -1 
-							&& Buffer.concat(responseBuffer).length > maxContentLength
-						) {
-							onError('HTTP_CONTENT_EXCEEDED', res);
-						}
-					});
-
-					stream.on('error', (error) => {
-						if (res.aborted) return;
-						onError(ERROR_CODE.HTTP_STATUS_ERROR, error);
-					});
-
-					stream.on('end', () => {
-						let responseData = Buffer.concat(responseBuffer);
-						let result: Buffer | string = responseData;
-						if (responseType !== 'arraybuffer') {
-							result = responseData.toString('utf8');
-						}
-						onSuccess(result);
-					});
-				}
-			} else {
-				onError(res, ERROR_CODE.HTTP_STATUS_ERROR);
+		for (const h in headers) {
+			if (Object.hasOwnProperty.call(headers, h) && !headers[h]) {
+				delete headers[h];
 			}
+		}
 
-			// rebuild cancel
-			const originalCancel = leaf.cancel!;
-			leaf.cancel = async () => {
-				ctx.abort();
-				await originalCancel();
-			};
+		let req = transport.request({
+			method,
+			hostname,
+			port,
+			path: url$.replace(/^\?/, ''),
+			headers: headers as http.OutgoingHttpHeaders,
+			...requestOptions
+		}, (res) => {
+			if (!res.statusCode || req.destroyed) return;
+			if (res.statusCode >= 200 && res.statusCode < 300) {
+				// 可以通过onResponse对stream进行转换
+				if (responseType === 'stream') {
+					onSuccess(res);
+					return;
+				}
+								
+				let responseBuffer: any[] = [];
+				res.on('data', (chunk) => {
+					responseBuffer.push(chunk);
 
-			leaf.server = ctx;
+					// 如果指定，请确保内容长度不超过maxContentLength
+					if (
+						maxContentLength > -1 
+						&& Buffer.concat(responseBuffer).length > maxContentLength
+					) {
+						onError('HTTP_CONTENT_EXCEEDED', res);
+					}
+				});
 
-			body && typeof (body as any).pipe === 'function'
-				? (body as any).pipe(ctx)
-				: ctx.end(body);
+				res.on('error', /* istanbul ignore next */(error) => {
+					if (req.destroyed) return;
+					onError(ERROR_CODE.HTTP_STATUS_ERROR, error);
+				});
+
+				res.on('end', () => {
+					let responseData = Buffer.concat(responseBuffer);
+					let result: Buffer | string = responseData;
+					if (responseType !== 'arraybuffer') {
+						result = responseData.toString('utf8');
+					}
+
+					onSuccess(result);
+				});
+			} else {
+				onError(ERROR_CODE.HTTP_STATUS_ERROR, res);
+			}
 		});
+
+		// 不使用`req.setTimeout`, 存在延迟
+		timeout && (timer = setTimeout(() => {
+			req.destroy();
+			onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
+		}, timeout));
+
+		// rebuild cancel
+		const originalCancel = leaf.cancel!;
+		leaf.cancel = async () => {
+			req.destroy();
+			await originalCancel();
+		};
+
+		leaf.server = req;
+		
+		// body instanceof Readable
+		body && typeof (body as any).pipe === 'function'
+			? (body as any).pipe(req)
+			: req.end(body);
 	});
 };
