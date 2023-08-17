@@ -6,7 +6,7 @@ interface Adapter {
 }
 
 let adapter: Adapter;
-if (typeof process !== 'undefined') {
+if (typeof process !== 'undefined' && typeof window === 'undefined') {
 	adapter = require('@deot/http-server');
 } else {
 	adapter = require('@deot/http-client');
