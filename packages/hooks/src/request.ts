@@ -1,10 +1,25 @@
-/* eslint-disable no-cond-assign */
 import type { HTTPHook } from '@deot/http-core';
-import { Is, Utils } from './helper';
+import * as Is from '@deot/helper-is';
+import { getPropByPath } from '@deot/helper-utils';
 
 const JContentType = 'application/json'; // ['json']
 const XContentType = 'application/x-www-form-urlencoded'; // ['urlencoded', 'form', 'form-data']
 const MContentType = `multipart/form-data`;
+
+const stringifySafely = (rawValue: any) => {
+	if (typeof rawValue === 'string') {
+		try {
+			JSON.parse(rawValue);
+			return rawValue.trim();
+		} catch (e: any) {
+			if (e.name !== 'SyntaxError') {
+				throw e;
+			}
+		}
+	}
+
+	return JSON.stringify(rawValue);
+};
 
 /**
  * 如: { response: { status: 1 } }
@@ -19,7 +34,12 @@ const toURLEncodedForm = (body: Record<string, any>): string => {
 		/**
 		 * 过滤掉值为null, undefined情况
 		 */
-		if (body[key] || body[key] === false || body[key] === 0 || body[key] === '') {
+		if (
+			body[key] 
+			|| body[key] === false 
+			|| body[key] === 0 
+			|| body[key] === ''
+		) {
 			results.push(key + '=' + encodeURIComponent(Is.plainObject(body[key]) ? JSON.stringify(body[key]) : body[key]));
 		}
 	}
@@ -56,7 +76,7 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 			let delTmp: any[] = [];
 			pathAndSearch = pathAndSearch.replace(regex, key => {
 				let k = key.replace(/({|}|\s|:|\/)/g, '');
-				let result = Utils.getPropByPath(original, k);
+				let result = getPropByPath(original, k);
 				
 				delTmp.push(result);
 				return result.v 
@@ -123,10 +143,10 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 						'Content-Type': JContentType,
 						...headers
 					};
-					body = Utils.stringifySafely(body);
+					body = stringifySafely(body);
 				}
 			} else if (hasJSONContentType) {
-				body = Utils.stringifySafely(body);
+				body = stringifySafely(body);
 			}
 		}
 		

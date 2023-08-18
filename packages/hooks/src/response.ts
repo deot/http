@@ -1,5 +1,5 @@
 import type { HTTPHook } from '@deot/http-core';
-import { Is } from './helper';
+import * as Is from '@deot/helper-is';
 
 export const onTransformResponse: HTTPHook = (leaf) => {
 	let { body } = leaf.response!;
