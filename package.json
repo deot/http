@@ -12,7 +12,7 @@
     "lint:watch": "npm run lint -- --watch --fix",
     "link": "ddc link",
     "dev": "ddc dev",
-    "build": "ddc build --script-formats=es,cjs,umd,iife --node-package '@deot/http-server,@deot/http'",
+    "build": "ddc build --script-formats=es,cjs,umd,iife --node-package '@deot/http-server,@deot/http-hooks,@deot/http'",
     "update": "ddc update",
     "test": "ddc test",
     "add": "ddc add",

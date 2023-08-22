@@ -102,7 +102,7 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 			|| Is.blob(body) 
 			|| Is.formData(body)
 			|| Is.string(body)
-			|| Is.nil(body)
+			|| !body
 		)) {
 			if (Is.arrayBufferView(body)) {
 				body = (body as ArrayBufferView).buffer;

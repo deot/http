@@ -7,7 +7,7 @@ import { formDataToStream, readBlob } from './helper';
 export const onTransformRequestServer: HTTPHook = (leaf) => {
 	let { body, headers } = leaf.request;
 	
-	if (!(Is.buffer(body) || Is.stream(body) || Is.string(body))) {
+	if (!(Is.buffer(body) || Is.stream(body) || Is.string(body) || !body)) {
 		if (Is.arrayBuffer(body)) {
 			body = Buffer.from(new Uint8Array(body as ArrayBuffer));
 		} else if (Is.formData(body)) {
