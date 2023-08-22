@@ -158,6 +158,7 @@ describe('xhr.ts', async () => {
 		let headers = {};
 		// eslint-disable-next-line no-proto
 		(headers as any).__proto__['Cookie'] = 'any';
+		(headers as any)['Cookies'] = '';
 		await Network.http(`${serverUrl}`, {
 			headers
 		});

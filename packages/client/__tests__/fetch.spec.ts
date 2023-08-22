@@ -139,6 +139,16 @@ describe('fetch.ts', async () => {
 		}
 	});
 
+	it('headers', async () => {
+		let headers = {};
+		// eslint-disable-next-line no-proto
+		(headers as any).__proto__['Cookie'] = 'any';
+		(headers as any)['Cookies'] = '';
+		await Network.http(`${serverUrl}`, {
+			headers
+		});
+	});
+
 	it('server: 500', async () => {
 		try {
 			await Network.http(`${serverUrl}/500`);
