@@ -30,11 +30,11 @@ importers:
   packages/hooks:
     dependencies:
       '@deot/helper-is':
-        specifier: ^1.0.1
-        version: 1.0.1
-      '@deot/helper-utils':
         specifier: ^1.0.2
         version: 1.0.2
+      '@deot/helper-utils':
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       '@deot/http-core':
         specifier: '*'
@@ -593,12 +593,12 @@ packages:
       - webdriverio
     dev: true
 
-  /@deot/helper-is@1.0.1:
-    resolution: {integrity: sha512-1FNwpx6FI1vT7w+ahqQX8R1n039nPRlSPp8k3EDi7cDS2Dm8J76a4vgeMj4nIu4ONZmu97S/OLtbN58vVODMtA==}
+  /@deot/helper-is@1.0.2:
+    resolution: {integrity: sha512-kmyXttbAMavUey4JdJO26exqS0I+kked5lLgsPRH3AmDyg1qcPNviKXQMUcybBCwIgo0Ed7D8fhEP+oHclGcYw==}
     dev: false
 
-  /@deot/helper-utils@1.0.2:
-    resolution: {integrity: sha512-eOsODO/sI0oENp0Ns5104TqBwcJjqMUxnJhe6VIEs577GdcIPc9/QhVNs6FKSfJnQakAt1FTcpiLkw9xmIpHmA==}
+  /@deot/helper-utils@1.0.3:
+    resolution: {integrity: sha512-qec7IF9MEBYmSexlxxwUm/ZgHTYhXavvmo00vO9iKNmS9evCLH/KSmPt4gLmmrpBAnQrHaEdUxHBeGkxiEbfew==}
     dev: false
 
   /@es-joy/jsdoccomment@0.40.1:

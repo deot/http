@@ -26,7 +26,12 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			timer = null;
 		};
 
-
+		for (const h in headers) {
+			if (Object.hasOwnProperty.call(headers, h) && !headers[h]) {
+				delete headers[h];
+			}
+		}
+		
 		/**
 		 * bug fix, 看实际情况早处理
 		 * iOS 10 fetch() 没有finally方法

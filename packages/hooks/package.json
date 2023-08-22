@@ -19,8 +19,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/helper-is": "^1.0.1",
-    "@deot/helper-utils": "^1.0.2"
+    "@deot/helper-is": "^1.0.2",
+    "@deot/helper-utils": "^1.0.3"
   },
   "devDependencies": {
     "@deot/http-core": "*"

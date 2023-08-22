@@ -54,6 +54,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 		for (const h in headers) {
 			if (Object.hasOwnProperty.call(headers, h)) {
 				xhr.setRequestHeader(h, headers[h]);
+				!headers[h] && delete headers[h];
 			}
 		}
 

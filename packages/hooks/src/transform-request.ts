@@ -6,21 +6,6 @@ const JContentType = 'application/json'; // ['json']
 const XContentType = 'application/x-www-form-urlencoded'; // ['urlencoded', 'form', 'form-data']
 const MContentType = `multipart/form-data`;
 
-const stringifySafely = (rawValue: any) => {
-	if (typeof rawValue === 'string') {
-		try {
-			JSON.parse(rawValue);
-			return rawValue.trim();
-		} catch (e: any) {
-			if (e.name !== 'SyntaxError') {
-				throw e;
-			}
-		}
-	}
-
-	return JSON.stringify(rawValue);
-};
-
 /**
  * 如: { response: { status: 1 } }
  * 当前转义：response=%7B%22status%22%3A1%7D
@@ -68,7 +53,7 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 
 		let url$ = '';
 		let pathAndSearch = url.replace(/[a-zA-z]+:\/\/[^\/{]*/, (key) => {
-			url$ = key || '';
+			url$ = key;
 			return '';
 		});
 
@@ -127,8 +112,11 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 				};
 				body = (body as URLSearchParams).toString();
 			} else if (Is.files(body)) {
+				let original = body;
 				body = new FormData();
-				body.append('files[]', body);
+				Array.from((original as FileList)).forEach((file: File) => {
+					(body as any).append('files[]', file);
+				});
 			} else if (Is.plainObject(body)) {
 				if (contentType.includes(XContentType)) {
 					body = toURLEncodedForm(body as Record<string, any>);
@@ -136,21 +124,31 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 					let original = body as Record<string, any>;
 					body = new FormData();
 					Object.keys(original).forEach((key) => {
-						(body as FormData).append(key, original[key]);
+						let args: any = [key, original[key]];
+						/* istanbul ignore next -- @preserve */
+						if (Is.file(args[1]) && args[1].name) {
+							args.push(args[1].name);
+						}
+
+						if (Is.plainObject(args[1])) {
+							args[1] = JSON.stringify(args[1]);
+						}
+
+						(body as FormData).append.apply(body, args);
 					});
 				} else {
 					headers = {
 						'Content-Type': JContentType,
 						...headers
 					};
-					body = stringifySafely(body);
+					body = JSON.stringify(body);
 				}
-			} else if (hasJSONContentType) {
-				body = stringifySafely(body);
+			} else {
+				body = JSON.stringify(body);
 			}
 		}
 		
-		if (['post', 'put', 'patch'].includes(type)) {
+		if (!Is.formData(body) && ['post', 'put', 'patch'].includes(type)) {
 			headers = {
 				'Content-Type': XContentType,
 				...headers
@@ -158,6 +156,13 @@ export const onTransformRequest: HTTPHook = (leaf) => {
 		}
 	}
 
+	if (Is.formData(body)) {
+		headers = {
+			...headers,
+			'Content-Type': '',
+		};
+	}
+	
 	leaf.request.url = url;
 	leaf.request.body = body;
 	leaf.request.headers = headers;

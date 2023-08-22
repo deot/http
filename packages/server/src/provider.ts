@@ -29,7 +29,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 			url: url$,
 			maxRedirects, 
 			responseType, 
-			maxContentLength, 
+			maxContentLength = Infinity, 
 			body, 
 			method, 
 			headers,
@@ -118,8 +118,10 @@ export const provider: HTTPProvider = (request, leaf) => {
 		leaf.server = req;
 		
 		// body instanceof Readable
-		body && typeof (body as any).pipe === 'function'
-			? (body as any).pipe(req)
-			: req.end(body);
+		if (body && typeof (body as any).pipe === 'function') {
+			(body as any).pipe(req);
+		} else {
+			req.end(body);
+		}
 	});
 };

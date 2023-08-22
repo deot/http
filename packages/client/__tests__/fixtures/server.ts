@@ -65,9 +65,8 @@ const createServer = async (port: number, host: string) => {
 									}
 									resolve$({ response });
 								})
-								.catch(e => {
-									console.log(e);
-									resolve$({ response: { status: 0 } });
+								.catch((e: any) => {
+									resolve$({ response: { status: 0, body: e } });
 								});
 							return;
 						} 
@@ -85,7 +84,6 @@ const createServer = async (port: number, host: string) => {
 									resolve$({ response: JSON.parse(data.get('response')!) });
 								} catch {
 									resolve$({ response: { status: 0 } });
-									console.log(e);
 								}
 							}
 						});
@@ -111,9 +109,9 @@ const createServer = async (port: number, host: string) => {
 	});
 };
 export const impl = async () => {
-	// 并发时创建服务时间不同
-	await new Promise(_ => { setTimeout(_, Math.random() * 300); });
-	const { port, host, baseUrl } = await Server.available();
+	const host = Server.host();
+	const port = await Server.port(host, Math.ceil(Math.random() * 20000 + 1024));
+	const baseUrl = `http://${host}:${port}`;
 
 	let server: any;
 	beforeAll(async () => {
