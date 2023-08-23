@@ -3,17 +3,17 @@
 可适配任何端的网络控制，具体的请求实现`provider`控制
 
 ```ts
-import { HttpController, HttpRequest, HttpResponse } from '@deot/http-core';
+import { HTTPController, HTTPRequest, HTTPResponse } from '@deot/http-core';
 
 const baseURL = 'https://xxx.com';
 const apis = {
 	A_GET: '/api.json'
 };
-const Network = new HttpController({
-	provider: (request: HttpRequest) => {
+const Network = new HTTPController({
+	provider: (request: HTTPRequest) => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				resolve(new HttpResponse({ body: request.body }));
+				resolve(new HTTPResponse({ body: request.body }));
 			}, 300);
 		});
 	},
@@ -49,8 +49,9 @@ shell.send();
 await shell.cancel();
 ```
 
-- [HttpRequestOptions](./src/request.ts)
-- [HttpRequest](./src/request.ts)
-- [HttpResponse](./src/response.ts)
-- [HttpProvider](./src/provider.ts)
+- [HTTPRequestOptions](./src/request.ts)
+- [HTTPRequest](./src/request.ts)
+- [HTTPResponse](./src/response.ts)
+- [HTTPHeaders](./src/headers.ts)
+- [HTTPProvider](./src/provider.ts)
 

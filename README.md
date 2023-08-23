@@ -12,13 +12,29 @@
 [npm-shared-image]: https://img.shields.io/npm/v/@deot/http-shared.svg
 [npm-shared-url]: https://www.npmjs.com/package/@deot/http-shared
 
+[npm-core-image]: https://img.shields.io/npm/v/@deot/http-core.svg
+[npm-core-url]: https://www.npmjs.com/package/@deot/http-shared
+
+[npm-client-image]: https://img.shields.io/npm/v/@deot/http-client.svg
+[npm-client-url]: https://www.npmjs.com/package/@deot/http-shared
+
+[npm-hooks-image]: https://img.shields.io/npm/v/@deot/http-hooks.svg
+[npm-hooks-url]: https://www.npmjs.com/package/@deot/http-hooks
+
+[npm-server-image]: https://img.shields.io/npm/v/@deot/http-server.svg
+[npm-server-url]: https://www.npmjs.com/package/@deot/http-server
+
 [npm-image]: https://img.shields.io/npm/v/@deot/http.svg
 [npm-url]: https://www.npmjs.com/package/@deot/http
 
-| 包名                        | 版本                                         | 说明                                     |
-| ------------------------- | ------------------------------------------ | -------------------------------------- |
-| [shared](packages/shared) | [![npm][npm-shared-image]][npm-shared-url] | 公共方法                                   |
-| [index](packages/index)   | [![npm][npm-image]][npm-url]               | 其他仓库的集成                           |
+| 包名                        | 版本                                         | 说明                                             |
+| ------------------------- | ------------------------------------------ | ---------------------------------------------- |
+| [core](packages/core)     | [![npm][npm-core-image]][npm-core-url]     | 控制中心，只需实现`provider`，即可实现技术JS`*`端的请求体           |
+| [client](packages/client) | [![npm][npm-client-image]][npm-client-url] | `Browser`端请求体                                  |
+| [server](packages/server) | [![npm][npm-server-image]][npm-server-url] | `Node`端请求体                                     |
+| [hooks](packages/hooks)   | [![npm][npm-hooks-image]][npm-hooks-url]   | 用于对`onRequest`和`onResponse`增强                  |
+| [shared](packages/shared) | [![npm][npm-shared-image]][npm-shared-url] | 公共方法（暂无）                                       |
+| [index](packages/index)   | [![npm][npm-image]][npm-url]               | 自动匹配使用`@deot/http-client`还是`@deot/http-server` |
 
 ## Contributing
 
