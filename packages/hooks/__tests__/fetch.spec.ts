@@ -1,5 +1,5 @@
 import { HTTPController } from '@deot/http-core';
-import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
+import { onRequest, onResponse } from '@deot/http-hooks';
 import * as Server from '../../client/__tests__/fixtures/server';
 import { provider } from '../../client/src/fetch';
 import * as Data from './fixtures/data';
@@ -22,8 +22,8 @@ describe('fetch.ts', async () => {
 	const serverUrl = await Server.impl();
 	const Network = new HTTPController({
 		provider,
-		onRequest: onTransformRequest,
-		onResponse: onTransformResponse
+		onRequest,
+		onResponse
 	});
 
 	it('Post, HTMLFormElement', async () => {

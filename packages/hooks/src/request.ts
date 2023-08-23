@@ -32,7 +32,7 @@ const toURLEncodedForm = (body: Record<string, any>): string => {
 	return results.join('&');
 };
 
-export const onTransformRequest: HTTPHook = (leaf) => {
+export const onRequest: HTTPHook = (leaf) => {
 	let { url, body, headers, method, dynamic } = leaf.request;
 	const type = method.toLowerCase();
 

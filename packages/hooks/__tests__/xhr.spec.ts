@@ -1,5 +1,5 @@
 import { HTTPController } from '@deot/http-core';
-import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
+import { onRequest, onResponse } from '@deot/http-hooks';
 import * as Server from '../../client/__tests__/fixtures/server';
 import { provider } from '../../client/src/xhr';
 import * as Data from './fixtures/data';
@@ -14,8 +14,8 @@ describe('xhr.ts', async () => {
 	const Network = new HTTPController({
 		credentials: 'omit',
 		provider,
-		onRequest: onTransformRequest,
-		onResponse: onTransformResponse
+		onRequest,
+		onResponse
 	});
 
 	it('Post, HTMLFormElement', async () => {

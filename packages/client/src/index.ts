@@ -1,6 +1,6 @@
 import { HTTPController } from "@deot/http-core";
 import type { HTTPRequestOptions } from "@deot/http-core";
-import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
+import { onRequest, onResponse } from '@deot/http-hooks';
 import { provider } from "./provider";
 
 export const createInstance = (options: HTTPRequestOptions = {}) => {
@@ -8,8 +8,8 @@ export const createInstance = (options: HTTPRequestOptions = {}) => {
 	const onBaseResponse = (Array.isArray(options.onResponse) ? options.onResponse : (options.onResponse ? [options.onResponse] : []));
 	const client = new HTTPController({
 		...options,
-		onRequest: onBaseRequest.concat([onTransformRequest]),
-		onResponse: [onTransformResponse].concat(onBaseResponse),
+		onRequest: onBaseRequest.concat([onRequest]),
+		onResponse: [onResponse].concat(onBaseResponse),
 		provider
 	});
 

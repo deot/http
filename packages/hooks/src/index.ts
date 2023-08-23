@@ -1,2 +1,2 @@
-export * from './transform-response';
-export * from './transform-request';
+export * from './response';
+export * from './request';

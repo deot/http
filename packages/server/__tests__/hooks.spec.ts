@@ -2,7 +2,7 @@ import { Readable } from 'node:stream';
 import { createInstance } from '@deot/http-server';
 import * as Server from '../../client/__tests__/fixtures/server';
 import * as Data from '../../hooks/__tests__/fixtures/data';
-import { onTransformRequest as onTransformRequestServer } from '../src/transform-request';
+import { onRequest } from '../src/on-request';
 import { formDataToStream } from '../src/helper';
 
 // @vitest-environment node
@@ -143,7 +143,7 @@ describe('hooks.ts', async () => {
 			await Network.http(`${serverUrl}`, {
 				method: 'POST',
 				body: new Date(),
-				onRequest: [onTransformRequestServer]
+				onRequest: [onRequest]
 			});
 		} catch (e: any) {
 			expect(e.body.message).toMatch('Body after t');

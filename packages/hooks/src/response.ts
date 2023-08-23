@@ -1,7 +1,7 @@
 import type { HTTPHook } from '@deot/http-core';
 import * as Is from '@deot/helper-is';
 
-export const onTransformResponse: HTTPHook = (leaf) => {
+export const onResponse: HTTPHook = (leaf) => {
 	let { body } = leaf.response!;
 	
 	if (Is.string(body)) {

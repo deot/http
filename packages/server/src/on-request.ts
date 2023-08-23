@@ -4,7 +4,7 @@ import * as Is from '@deot/helper-is';
 import { formDataToStream, readBlob } from './helper';
 
 // 针对服务端要额外做处理
-export const onTransformRequest: HTTPHook = (leaf) => {
+export const onRequest: HTTPHook = (leaf) => {
 	let { body, headers } = leaf.request;
 	
 	if (!(Is.buffer(body) || Is.stream(body) || Is.string(body) || !body)) {

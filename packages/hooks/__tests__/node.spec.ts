@@ -1,8 +1,8 @@
 import { HTTPController } from '@deot/http-core';
-import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
+import { onRequest, onResponse } from '@deot/http-hooks';
 import * as Server from '../../client/__tests__/fixtures/server';
 import { provider } from '../../server/src/provider';
-import { onTransformRequest as onTransformRequestServer } from '../../server/src/transform-request';
+import { onRequest as onRequestServer } from '../../server/src/on-request';
 import * as Data from './fixtures/data';
 
 const JContentType = 'application/json'; // ['json']
@@ -14,8 +14,8 @@ describe('node.ts', async () => {
 	const serverUrl = await Server.impl();
 	const Network = new HTTPController({
 		provider,
-		onRequest: [onTransformRequest, onTransformRequestServer],
-		onResponse: onTransformResponse
+		onRequest: [onRequest, onRequestServer],
+		onResponse
 	});
 
 	it('Post, FormData', async () => {

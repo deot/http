@@ -1,4 +1,6 @@
 import type { HTTPController, HTTPRequestOptions } from "@deot/http-core";
+import * as ServerAdapter from "@deot/http-server";
+import * as ClientAdapter from "@deot/http-client";
 
 interface Adapter {
 	createInstance: (options: HTTPRequestOptions) => HTTPController;
@@ -7,9 +9,9 @@ interface Adapter {
 
 let adapter: Adapter;
 if (typeof process !== 'undefined' && typeof window === 'undefined') {
-	adapter = require('@deot/http-server');
+	adapter = ServerAdapter;
 } else {
-	adapter = require('@deot/http-client');
+	adapter = ClientAdapter;
 }
 
 export const createInstance = adapter.createInstance;

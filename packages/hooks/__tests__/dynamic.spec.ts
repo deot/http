@@ -1,11 +1,11 @@
 import { HTTPController, HTTPResponse } from '@deot/http-core';
-import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
+import { onRequest, onResponse } from '@deot/http-hooks';
 
 describe('common.ts', async () => {
 	const Network = new HTTPController({
 		provider: async (request) => (new HTTPResponse({ body: { url: request.url } })),
-		onRequest: onTransformRequest,
-		onResponse: onTransformResponse
+		onRequest,
+		onResponse
 	});
 
 	
