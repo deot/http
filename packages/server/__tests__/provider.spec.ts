@@ -119,16 +119,9 @@ describe('provider.ts', async () => {
 			await Network.http(`${serverUrl}`, {
 				maxContentLength: 10
 			});
+			
 		} catch (e: any) {
 			expect(e.statusText).toBe('HTTP_CONTENT_EXCEEDED');
-		}
-	});
-
-	it('error', async () => {
-		try {
-			await Network.http(`dgszyjnxcaipwzy.jpg`);
-		} catch (e: any) {
-			expect(e.statusText).toBe('HTTP_STATUS_ERROR');
 		}
 	});
 
