@@ -51,11 +51,8 @@ export const provider: HTTPProvider = (request, leaf) => {
 		timeout && (xhr.timeout = timeout);
 		responseType && (xhr.responseType = responseType); 
 
-		for (const h in headers) {
-			if (Object.hasOwnProperty.call(headers, h)) {
-				xhr.setRequestHeader(h, headers[h]);
-				!headers[h] && delete headers[h];
-			}
+		for (const h in headers.toJSON()) {
+			xhr.setRequestHeader(h, headers[h]);
 		}
 
 		xhr.send(body as any);

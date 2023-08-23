@@ -1,4 +1,5 @@
 /* eslint-disable lines-between-class-members */
+import { HTTPHeaders } from './headers';
 
 export interface HTTPResponseOptions {
 	// Allow Extra KeyValue
@@ -6,7 +7,7 @@ export interface HTTPResponseOptions {
 
 	body?: Record<string, any> | BodyInit | null;
 	// From ResponseInit
-	headers?: HeadersInit;
+	headers?: HeadersInit | HTTPHeaders;
 	status?: number;
 	statusText?: string;
 	// From Response
@@ -23,7 +24,7 @@ export class HTTPResponse<T = Record<string, any> | BodyInit | null> {
 	// From Response
 	url!: string;
 	body!: T; // ReadableStream | Blob | BufferSource | FormData | URLSearchParams | string
-	headers!: HeadersInit;
+	headers!: HTTPHeaders;
 	status!: number;
 	statusText!: string;
 	redirected!: boolean;
@@ -55,9 +56,10 @@ export class HTTPResponse<T = Record<string, any> | BodyInit | null> {
 			: { ...defaults, body, ...options };
 
 		Object.keys(kv).forEach((key) => {
-			this[key] = typeof kv[key] !== 'undefined' 
+			let v = typeof kv[key] !== 'undefined' 
 				? kv[key] 
 				: defaults[key];
+			this[key] = key === 'headers' ? new HTTPHeaders(v) : v;
 		});
 	}
 

@@ -31,7 +31,7 @@ describe('fetch.ts', async () => {
 			method: 'POST',
 			body: Data.form,
 			onResponse(leaf) {
-				expect(leaf.request.headers['Content-Type']).toBe(undefined);
+				expect(leaf.request.headers['Content-Type']).toBe(null);
 			}
 		});
 		expect(response.body).toEqual(Data.response);
@@ -46,7 +46,7 @@ describe('fetch.ts', async () => {
 				(leaf.request.body as any).delete('file');
 			},
 			onResponse(leaf) {
-				expect(leaf.request.headers['Content-Type']).toBe(undefined);
+				expect(leaf.request.headers['Content-Type']).toBe(null);
 			}
 		});
 		expect(response.body).toEqual(Data.response);

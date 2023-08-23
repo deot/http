@@ -48,18 +48,12 @@ export const provider: HTTPProvider = (request, leaf) => {
 			transport = isHttps ? httpsFollow : httpFollow;
 		}
 
-		for (const h in headers) {
-			if (Object.hasOwnProperty.call(headers, h) && !headers[h]) {
-				delete headers[h];
-			}
-		}
-
 		let req = transport.request({
 			method,
 			hostname,
 			port,
 			path: url$.replace(/^\?/, ''),
-			headers: headers as http.OutgoingHttpHeaders,
+			headers: headers.toJSON(),
 			...requestOptions
 		}, (res) => {
 			if (!res.statusCode || req.destroyed) return;

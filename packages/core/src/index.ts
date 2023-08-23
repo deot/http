@@ -5,3 +5,4 @@ export * from './response';
 export * from './shell';
 export * from './shell-leaf';
 export * from './error';
+export * from './headers';

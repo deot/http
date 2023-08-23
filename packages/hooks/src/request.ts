@@ -82,7 +82,7 @@ export const onRequest: HTTPHook = (leaf) => {
 
 		body = null;
 	} else {
-		const contentType = headers['Content-Type'] || '';
+		const contentType = headers.get('Content-Type') || '';
 		const hasJSONContentType = contentType.includes(JContentType);
 
 		if (Is.object(body) && Is.formEl(body)) {
@@ -107,10 +107,7 @@ export const onRequest: HTTPHook = (leaf) => {
 			if (Is.arrayBufferView(body)) {
 				body = (body as ArrayBufferView).buffer;
 			} else if (Is.params(body)) {
-				headers = {
-					'Content-Type': XContentType,
-					...headers
-				};
+				headers.set('Content-Type', XContentType, false);
 				body = (body as URLSearchParams).toString();
 			} else if (Is.files(body)) {
 				let original = body;
@@ -138,10 +135,7 @@ export const onRequest: HTTPHook = (leaf) => {
 						(body as FormData).append.apply(body, args);
 					});
 				} else {
-					headers = {
-						'Content-Type': JContentType,
-						...headers
-					};
+					headers.set('Content-Type', JContentType, false);
 					body = JSON.stringify(body);
 				}
 			} else {
@@ -150,18 +144,12 @@ export const onRequest: HTTPHook = (leaf) => {
 		}
 		
 		if (!Is.formData(body) && ['post', 'put', 'patch'].includes(type)) {
-			headers = {
-				'Content-Type': XContentType,
-				...headers
-			};
+			headers.set('Content-Type', XContentType, false);
 		}
 	}
 
 	if (Is.formData(body)) {
-		headers = {
-			...headers,
-			'Content-Type': '',
-		};
+		headers.set('Content-Type', null, true);
 	}
 	
 	leaf.request.url = url;

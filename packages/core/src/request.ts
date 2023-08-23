@@ -1,6 +1,7 @@
 /* eslint-disable lines-between-class-members */
 import type { HTTPShellLeaf } from './shell-leaf';
 import type { HTTPProvider } from './provider';
+import { HTTPHeaders } from './headers';
 import { HTTPResponse } from './response';
 
 export interface HTTPRequestOptions {
@@ -11,7 +12,7 @@ export interface HTTPRequestOptions {
 
 	// From Request, removed(signal)
 	method?: string;
-	headers?: HeadersInit;
+	headers?: HeadersInit | HTTPHeaders;
 	body?: Record<string, any> | BodyInit | null;
 	mode?: RequestMode;
 	credentials?: RequestCredentials;
@@ -46,7 +47,7 @@ export class HTTPRequest {
 	// From Request, removed(signal)
 	url!: string;
 	method!: string;
-	headers!: HeadersInit;
+	headers!: HTTPHeaders;
 	body!: Record<string, any> | BodyInit | null;
 	mode!: RequestMode;
 	credentials!: RequestCredentials;
@@ -101,9 +102,10 @@ export class HTTPRequest {
 			: { ...defaults, ...parent, url, ...options };
 
 		Object.keys(kv).forEach((key) => {
-			this[key] = typeof kv[key] !== 'undefined' 
+			const v = typeof kv[key] !== 'undefined' 
 				? kv[key]
 				: defaults[key];
+			this[key] = key === 'headers' ? new HTTPHeaders(v) : v;
 		});
 
 		// Merge Hooks & Filter Same

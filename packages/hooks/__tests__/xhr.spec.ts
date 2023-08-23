@@ -23,7 +23,7 @@ describe('xhr.ts', async () => {
 			method: 'POST',
 			body: Data.form,
 			onResponse(leaf) {
-				expect(leaf.request.headers['Content-Type']).toBe(undefined);
+				expect(leaf.request.headers['Content-Type']).toBe(null);
 			}
 		});
 		expect(response.body).toEqual(Data.response);
@@ -34,7 +34,7 @@ describe('xhr.ts', async () => {
 			method: 'POST',
 			body: Data.formData,
 			onResponse(leaf) {
-				expect(leaf.request.headers['Content-Type']).toBe(undefined);
+				expect(leaf.request.headers['Content-Type']).toBe(null);
 			}
 		});
 		expect(response.body).toEqual(Data.response);

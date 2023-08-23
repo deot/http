@@ -26,19 +26,13 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			timer = null;
 		};
 
-		for (const h in headers) {
-			if (Object.hasOwnProperty.call(headers, h) && !headers[h]) {
-				delete headers[h];
-			}
-		}
-		
 		/**
 		 * bug fix, 看实际情况早处理
 		 * iOS 10 fetch() 没有finally方法
 		 * 使用@babel/polyfill修复Promise，无法修复fetch，可见fetch内部实现了一套Promise
 		 */
 		const fetch$ = fetch(url, {
-			headers,
+			headers: headers.toJSON(),
 			body: body as any,
 			credentials,
 			method,

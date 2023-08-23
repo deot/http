@@ -14,26 +14,16 @@ export const onRequest: HTTPHook = (leaf) => {
 			body = formDataToStream(
 				body as FormData,
 				(formHeaders: any) => {
-					headers = {
-						...headers,
-						...formHeaders
-					};
+					headers.set(formHeaders, true);
 				}
 			);
 		} else if (Is.blob(body) || Is.file(body)) {
 			let original = body as Blob;
 			if (original.size) {
-				headers = {
-					...headers,
-					'Content-Type': original.type || 'application/octet-stream'
-				};
+				headers.set('Content-Type', original.type || 'application/octet-stream', true);
 			}
 
-			headers = {
-				...headers,
-				'Content-Length': `${original.size || 0}`
-			};
-
+			headers.set('Content-Length', `${original.size || 0}`, true);
 			body = Readable.from(readBlob(original));
 		} else {
 			throw new Error('Body after transformation must be a string, an ArrayBuffer, a Buffer, a Blob, or a Stream');
