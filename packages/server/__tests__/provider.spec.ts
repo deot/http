@@ -2,7 +2,7 @@ import { Readable } from 'node:stream';
 import { createInstance } from '@deot/http-server';
 import * as Server from '../../client/__tests__/fixtures/server';
 
-describe('server.ts', async () => {
+describe('provider.ts', async () => {
 	const serverUrl = await Server.impl();
 	const Network = createInstance({
 		credentials: 'omit'

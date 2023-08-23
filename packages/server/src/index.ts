@@ -1,6 +1,7 @@
 import { HTTPController } from "@deot/http-core";
 import type { HTTPRequestOptions } from "@deot/http-core";
-import { onTransformRequest, onTransformResponse, onTransformRequestServer } from '@deot/http-hooks';
+import { onTransformRequest, onTransformResponse } from '@deot/http-hooks';
+import { onTransformRequest as onTransformRequestServer } from './transform-request';
 import { provider } from "./provider";
 
 export const createInstance = (options: HTTPRequestOptions = {}) => {
