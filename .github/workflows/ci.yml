@@ -15,7 +15,9 @@ permissions:
 jobs:
   unit-test:
     # let's ignore release commits, otherwise it'll try to run twice
-    if: ${{ !startsWith(github.event.head_commit.message , 'chore(release):') }}
+    if: |
+      !startsWith(github.event.head_commit.message , 'chore(release):') && 
+      !startsWith(github.event.head_commit.message , 'docs')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
