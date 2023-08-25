@@ -15,11 +15,11 @@ importers:
   packages/client:
     dependencies:
       '@deot/http-core':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../core
       '@deot/http-hooks':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../hooks
     devDependencies:
       formidable:
         specifier: ^3.5.0
@@ -37,21 +37,21 @@ importers:
         version: 1.1.1
     devDependencies:
       '@deot/http-core':
-        specifier: ^1.0.0
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../core
 
   packages/index:
     dependencies:
       '@deot/http-client':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../client
       '@deot/http-server':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../server
     devDependencies:
       '@deot/http-core':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../core
 
   packages/server:
     dependencies:
@@ -62,11 +62,11 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       '@deot/http-core':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../core
       '@deot/http-hooks':
-        specifier: '*'
-        version: 1.0.1
+        specifier: ^1.1.1
+        version: link:../hooks
       follow-redirects:
         specifier: ^1.15.2
         version: 1.15.2
@@ -605,42 +605,6 @@ packages:
 
   /@deot/helper-utils@1.1.1:
     resolution: {integrity: sha512-ivsCdzw6pEwu3WiUDejxDqC4kOF/oQvpWNw9acUBMO3iGcEtBnrJSQumppghOrvTbtZnXuMz0HcCfgxPkEKkJg==}
-    dev: false
-
-  /@deot/http-client@1.0.1:
-    resolution: {integrity: sha512-0V1VyqApw8CkCov5U0B5UlZ9E/9bg109gTp38YODZ4y4+oUKDxITOgcFpVV+KfegCmoo7oxffVEj4l2IwKQrEA==}
-    dependencies:
-      '@deot/http-core': 1.0.1
-      '@deot/http-hooks': 1.1.0
-    dev: false
-
-  /@deot/http-core@1.0.1:
-    resolution: {integrity: sha512-YPVwJfcw1k8JEzC1v5UL91V5fmXYAs3sSKBWFH6pMXa3MAW/nlrj6VujFBodupA7CyxLCsLyOQmDag8+GWAD7w==}
-
-  /@deot/http-hooks@1.0.1:
-    resolution: {integrity: sha512-35oqohsm+aZWQaL0KifAP/zwpNDcObiA950PlQJQhW9UAvOMsRww/sScVAqamhCxbcxGIUmXK38hXtaZqzyofg==}
-    dependencies:
-      '@deot/helper-is': 1.1.1
-      '@deot/helper-utils': 1.1.1
-    dev: false
-
-  /@deot/http-hooks@1.1.0:
-    resolution: {integrity: sha512-P/tC7puCoLhYX9M09C4zDsaK4cWOtaewB1pncuOrz68KkjhVN1eB13U8WGzghvD79KeQCDMlqCDhf4XaTD5Hfg==}
-    dependencies:
-      '@deot/helper-is': 1.1.1
-      '@deot/helper-utils': 1.1.1
-    dev: false
-
-  /@deot/http-server@1.0.1:
-    resolution: {integrity: sha512-TvjQGQBH4reRV/bIytHeGZNGtsp1C09WieyMY4yCkW2Qrd1/ta91/vTJ1sDHwF65BgiyolHncYuwO13C1AzCtw==}
-    dependencies:
-      '@deot/helper-is': 1.1.1
-      '@deot/helper-utils': 1.1.1
-      '@deot/http-core': 1.0.1
-      '@deot/http-hooks': 1.1.0
-      follow-redirects: 1.15.2
-    transitivePeerDependencies:
-      - debug
     dev: false
 
   /@es-joy/jsdoccomment@0.40.1:

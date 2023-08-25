@@ -1,6 +1,6 @@
 {
   "name": "@deot/http-server",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "type": "module",
   "main": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -21,8 +21,8 @@
   "dependencies": {
     "@deot/helper-is": "^1.1.1",
     "@deot/helper-utils": "^1.1.1",
-    "@deot/http-core": "*",
-    "@deot/http-hooks": "*",
+    "@deot/http-core": "^1.1.1",
+    "@deot/http-hooks": "^1.1.1",
     "follow-redirects": "^1.15.2"
   }
 }
