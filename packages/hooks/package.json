@@ -1,13 +1,13 @@
 {
   "name": "@deot/http-hooks",
   "version": "1.0.0",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
+  "type": "module",
+  "main": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js",
+      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     }
   },
@@ -19,10 +19,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/helper-is": "^1.0.2",
-    "@deot/helper-utils": "^1.0.3"
+    "@deot/helper-is": "^1.1.1",
+    "@deot/helper-utils": "^1.1.1"
   },
   "devDependencies": {
-    "@deot/http-core": "*"
+    "@deot/http-core": "^1.0.0"
   }
 }

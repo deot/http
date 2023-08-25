@@ -1,11 +1,12 @@
 import * as http from 'node:http';
 import * as https from 'node:https';
 import * as url from 'node:url';
-
-import { http as httpFollow, https as httpsFollow } from 'follow-redirects';
+import followRedirects from 'follow-redirects';
 
 import type { HTTPProvider } from "@deot/http-core";
 import { HTTPResponse, ERROR_CODE } from "@deot/http-core";
+
+const { http: httpFollow, https: httpsFollow } = followRedirects;
 
 export const provider: HTTPProvider = (request, leaf) => {
 	return new Promise((resolve, reject) => {
