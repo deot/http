@@ -21,4 +21,4 @@ shell.send();
 await shell.cancel();
 ```
 
-所有`api`与[`@deot/http-core`](../src/core)一致，可忽略`provider`实现细节
+所有`api`与[`@deot/http-core`](../core)一致，可忽略`provider`实现细节

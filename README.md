@@ -29,7 +29,7 @@
 
 | 包名                        | 版本                                         | 说明                                             |
 | ------------------------- | ------------------------------------------ | ---------------------------------------------- |
-| [core](packages/core)     | [![npm][npm-core-image]][npm-core-url]     | 控制中心，只需实现`provider`，即可实现技术JS`*`端的请求体           |
+| [core](packages/core)     | [![npm][npm-core-image]][npm-core-url]     | 控制中心，只需实现`provider`，即可实现基于JS`*`端的请求体           |
 | [client](packages/client) | [![npm][npm-client-image]][npm-client-url] | `Browser`端请求体                                  |
 | [server](packages/server) | [![npm][npm-server-image]][npm-server-url] | `Node`端请求体                                     |
 | [hooks](packages/hooks)   | [![npm][npm-hooks-image]][npm-hooks-url]   | 用于对`onRequest`和`onResponse`增强                  |
