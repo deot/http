@@ -87,7 +87,7 @@ jobs:
       - name: Set node version to 20
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 20.5.1
           cache: 'pnpm'
 
       - name: Checkout main
