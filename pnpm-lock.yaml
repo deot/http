@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@deot/dev':
-        specifier: ^2.5.6
-        version: 2.5.6(@babel/eslint-parser@7.21.3)(@vue/compiler-sfc@3.3.4)(eslint@8.48.0)(stylelint@15.10.3)(typescript@5.1.6)(vite@4.4.9)
+        specifier: ^2.5.7
+        version: 2.5.7(@babel/eslint-parser@7.21.3)(@vue/compiler-sfc@3.3.4)(eslint@8.48.0)(stylelint@15.10.3)(typescript@5.1.6)(vite@4.4.9)
 
   packages/client:
     dependencies:
@@ -452,8 +452,8 @@ packages:
       ora: 7.0.1
     dev: true
 
-  /@deot/dev-builder@2.5.3(@vue/compiler-sfc@3.3.4)(typescript@5.1.6):
-    resolution: {integrity: sha512-gWgJWxiYdYkxn16xOfs+k7PTdRqGLCD34YQWb6782Eo9SVA27NAyblR7rCimYWxNobwIXRAxGUOdEVSZcPmf6w==}
+  /@deot/dev-builder@2.5.4(@vue/compiler-sfc@3.3.4)(typescript@5.1.6):
+    resolution: {integrity: sha512-m7iMFhv2LplJ/ZNLTNjzaW5jyuB/LsR5l9PmW7PYD7lX1r0wXii0xR4mthj8Pq0QLvov6CZIRu88ucN2Rh05IA==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -489,12 +489,12 @@ packages:
       - terser
     dev: true
 
-  /@deot/dev-cli@2.5.6(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)(vite@4.4.9):
-    resolution: {integrity: sha512-a0qq5K5+ENnEGWW+XWFSc4JhAWjhIY8o6YBgu/HhBBfV/UWnb5/5kaONKAMsi28UrVU5X0qNtF/7mJt9uCKNZw==}
+  /@deot/dev-cli@2.5.7(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)(vite@4.4.9):
+    resolution: {integrity: sha512-3yVL2/84d++yuG+vqp30e+kCi2n09CwUYUAHyQb01hBWq6hkUoZR4q1KIEpJOrE85t8toV+4pMShGYuh0sir9Q==}
     hasBin: true
     dependencies:
       '@deot/dev-adder': 2.5.0
-      '@deot/dev-builder': 2.5.3(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)
+      '@deot/dev-builder': 2.5.4(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)
       '@deot/dev-linker': 2.5.0
       '@deot/dev-releaser': 2.5.2
       '@deot/dev-shared': 2.5.0
@@ -714,12 +714,12 @@ packages:
       - typescript
     dev: true
 
-  /@deot/dev@2.5.6(@babel/eslint-parser@7.21.3)(@vue/compiler-sfc@3.3.4)(eslint@8.48.0)(stylelint@15.10.3)(typescript@5.1.6)(vite@4.4.9):
-    resolution: {integrity: sha512-qo2oBRrG7X10IoVU9ZGPeyiSZ+Ur5Rg0grNKuy6mCZ236YPf4VtHJJhxs7wM/d45TiJbHGjjTTm8eJXCEvwSCQ==}
+  /@deot/dev@2.5.7(@babel/eslint-parser@7.21.3)(@vue/compiler-sfc@3.3.4)(eslint@8.48.0)(stylelint@15.10.3)(typescript@5.1.6)(vite@4.4.9):
+    resolution: {integrity: sha512-wGpJadzP1LPfXiNoGylifddPtO8F2PHkf2V1RCw+m3JjEqOaXdGRcr2ZWIFG3Lv4zSOh/YAhaOdifZ5Dq7BiVw==}
     dependencies:
       '@deot/dev-adder': 2.5.0
-      '@deot/dev-builder': 2.5.3(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)
-      '@deot/dev-cli': 2.5.6(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)(vite@4.4.9)
+      '@deot/dev-builder': 2.5.4(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)
+      '@deot/dev-cli': 2.5.7(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)(vite@4.4.9)
       '@deot/dev-deps': 2.5.0
       '@deot/dev-dever': 2.5.3(@vue/compiler-sfc@3.3.4)(typescript@5.1.6)
       '@deot/dev-eslint': 2.5.1(@babel/eslint-parser@7.21.3)(eslint@8.48.0)(typescript@5.1.6)
