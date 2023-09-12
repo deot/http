@@ -5,7 +5,7 @@ export interface HTTPResponseOptions {
 	// Allow Extra KeyValue
 	[key: string]: any;
 
-	body?: Record<string, any> | BodyInit | null;
+	body?: {} | BodyInit | null;
 	// From ResponseInit
 	headers?: HeadersInit | HTTPHeaders;
 	status?: number;
@@ -17,7 +17,7 @@ export interface HTTPResponseOptions {
 	ok?: boolean;
 }
 
-export class HTTPResponse<T = Record<string, any> | BodyInit | null> {
+export class HTTPResponse<T = {} | BodyInit | null> {
 	// Allow Extra KeyValue
 	[key: string]: any;
 

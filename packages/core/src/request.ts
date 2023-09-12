@@ -13,7 +13,7 @@ export interface HTTPRequestOptions {
 	// From Request, removed(signal)
 	method?: string;
 	headers?: HeadersInit | HTTPHeaders;
-	body?: Record<string, any> | BodyInit | null;
+	body?: {} | BodyInit | null;
 	mode?: RequestMode;
 	credentials?: RequestCredentials;
 	cache?: RequestCache;
@@ -48,7 +48,7 @@ export class HTTPRequest {
 	url!: string;
 	method!: string;
 	headers!: HTTPHeaders;
-	body!: Record<string, any> | BodyInit | null;
+	body!: {} | BodyInit | null;
 	mode!: RequestMode;
 	credentials!: RequestCredentials;
 	cache!: RequestCache;

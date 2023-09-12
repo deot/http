@@ -1,6 +1,6 @@
 /* eslint-disable no-dupe-class-members */
 /* eslint-disable lines-between-class-members */
-type Headers = HTTPHeaders | Record<string, any> | HeadersInit;
+type Headers = HTTPHeaders | {} | HeadersInit;
 
 export class HTTPHeaders {
 	[key: string]: any;

@@ -10,10 +10,10 @@ const MContentType = `multipart/form-data`;
  * 如: { response: { status: 1 } }
  * 当前转义：response=%7B%22status%22%3A1%7D
  * axios转义：response%5Bstatus%5D=1 (reponse[status]=1)
- * @param {Record<string, any>} body ~
+ * @param {{}} body ~
  * @returns {string} ~
  */
-const toURLEncodedForm = (body: Record<string, any>): string => {
+const toURLEncodedForm = (body: {}): string => {
 	const results: string[] = [];
 	for (let key in body) {
 		/**
@@ -48,7 +48,7 @@ export const onRequest: HTTPHook = (leaf) => {
 	 * 2. 对应使用过的字段会被移除，如果是 config.article_id 会删除config下的article_id字段
 	 */
 	if (dynamic && Is.plainObject(body)) {
-		let original = body as Record<string, any>;
+		let original = body as {};
 		let regex = /(\/?{[^?\/\&]+|\/?:[^\d][^?\/\&]+)/g;
 
 		let url$ = '';
@@ -75,7 +75,7 @@ export const onRequest: HTTPHook = (leaf) => {
 	}
 
 	if (['get'].includes(type) && Is.plainObject(body)) {
-		let encodedForm = toURLEncodedForm(body as Record<string, any>);
+		let encodedForm = toURLEncodedForm(body as {});
 		if (encodedForm.length > 0) {
 			url += (url.includes('?') ? '&' : '?') + encodedForm;
 		}
@@ -117,9 +117,9 @@ export const onRequest: HTTPHook = (leaf) => {
 				});
 			} else if (Is.plainObject(body)) {
 				if (contentType.includes(XContentType)) {
-					body = toURLEncodedForm(body as Record<string, any>);
+					body = toURLEncodedForm(body as {});
 				} else if (contentType.includes(MContentType)) {
-					let original = body as Record<string, any>;
+					let original = body as {};
 					body = new FormData();
 					Object.keys(original).forEach((key) => {
 						let args: any = [key, original[key]];
