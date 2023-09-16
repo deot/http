@@ -6,7 +6,7 @@ export class HTTPHeaders {
 	[key: string]: any;
 
 	constructor(headers?: Headers) {
-		headers && this.set(headers, true);
+		typeof headers === 'object' && this.set(headers, true);
 	}
 
 	set(headers: Headers, rewrite?: boolean): HTTPHeaders;

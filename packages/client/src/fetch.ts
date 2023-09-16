@@ -1,9 +1,10 @@
 import type { HTTPProvider } from "@deot/http-core";
-import { HTTPRequest, HTTPResponse, HTTPShellLeaf, ERROR_CODE } from "@deot/http-core";
+import { HTTPRequest, HTTPResponse, HTTPHeaders, HTTPShellLeaf, ERROR_CODE } from "@deot/http-core";
 
 export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf) => {
 	return new Promise((resolve, reject) => {
 		const { url, headers, body, credentials, method, timeout, responseType, ...fetchOptions } = request;
+
 
 		const controller = new AbortController();
 
@@ -13,15 +14,33 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 				onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
 			}, timeout)
 			: null;
+		let response: Response; 
+
+		const getExtra = () => {
+			let headers$ = new HTTPHeaders();
+			if (response) {
+				response.headers.forEach((v, k) => headers$.set(k, v, true));
+			}
+			return {
+				status: response?.status,
+				headers: headers$
+			};
+		};
 
 		const onError = (statusText: string, body$?: any) => {
-			reject(HTTPResponse.error(statusText, body$));
+			reject(HTTPResponse.error(statusText, {
+				...getExtra(),
+				body: body$
+			}));
 			timer && clearTimeout(timer);
 			timer = null;
 		};
 
 		const onSuccess = (body$: any) => {
-			resolve(new HTTPResponse({ body: body$ }));
+			resolve(new HTTPResponse({ 
+				...getExtra(),
+				body: body$ 
+			}));
 			timer && clearTimeout(timer);
 			timer = null;
 		};
@@ -39,6 +58,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			signal: controller.signal,
 			...fetchOptions
 		}).then((res) => {
+			response = res;
 			if (res.status >= 200 && res.status < 300) {
 				let fn = res[responseType || 'text'];
 				if (!fn) return onSuccess(res);
@@ -52,6 +72,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			} else {
 				onError(ERROR_CODE.HTTP_STATUS_ERROR, res);
 			}
+
 			return res;
 		}).catch((e) => {
 			onError(ERROR_CODE.HTTP_STATUS_ERROR, e);

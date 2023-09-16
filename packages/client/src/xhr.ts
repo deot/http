@@ -1,18 +1,82 @@
 import type { HTTPProvider } from "@deot/http-core";
-import { HTTPResponse, ERROR_CODE } from "@deot/http-core";
+import { HTTPHeaders, HTTPResponse, ERROR_CODE } from "@deot/http-core";
+
+const ignoreDuplicateOf = {
+	'age': !0,
+	'authorization': !0,
+	'content-length': !0,
+	'content-type': !0,
+	'etag': !0,
+	'expires': !0,
+	'from': !0,
+	'host': !0,
+	'if-modified-since': !0,
+	'if-unmodified-since': !0,
+	'last-modified': !0,
+	'location': !0,
+	'max-forwards': !0,
+	'proxy-authorization': !0,
+	'referer': !0,
+	'retry-after': !0,
+	'user-agent': !0
+};
+// 可以考虑移入到HTTPHeaders内置作为string时的解析
+const parseHeaders = (rawHeaders: string) => {
+	const parsed = {};
+	let key: string;
+	let val: string;
+	let i: number;
+
+	rawHeaders && rawHeaders.split('\n').forEach((line) => {
+		i = line.indexOf(':');
+		key = line.substring(0, i).trim().toLowerCase();
+		val = line.substring(i + 1).trim();
+
+		/* istanbul ignore next -- @preserve */ 
+		if (!key || (parsed[key] && ignoreDuplicateOf[key])) {
+			return;
+		}
+
+		 /* istanbul ignore next -- @preserve */ 
+		if (key === 'set-cookie') {
+			if (parsed[key]) {
+				parsed[key].push(val);
+			} else {
+				parsed[key] = [val];
+			}
+		} else {
+			parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+		}
+	});
+
+	return parsed;
+};
 
 export const provider: HTTPProvider = (request, leaf) => {
 	return new Promise((resolve, reject) => {
 		const { onDownloadProgress, onUploadProgress, responseType, timeout, credentials, body, headers, method, url, async = true } = request;
 
 		let xhr = new XMLHttpRequest();
+		
+		const getExtra = () => {
+			return {
+				status: xhr.status,
+				headers: new HTTPHeaders(parseHeaders(xhr.getAllResponseHeaders()))
+			};
+		};
 
 		const onError = (statusText: string, body$?: any) => {
-			reject(HTTPResponse.error(statusText, body$));
+			reject(HTTPResponse.error(statusText, {
+				...getExtra(),
+				body: body$
+			}));
 		};
 
 		const onSuccess = (body$: any) => {
-			resolve(new HTTPResponse({ body: body$ }));
+			resolve(new HTTPResponse({ 
+				...getExtra(),
+				body: body$ 
+			}));
 		};
 
 		const on = (event: string, handler: any, target?: any) => {
@@ -32,10 +96,10 @@ export const provider: HTTPProvider = (request, leaf) => {
 					: xhr.response;
 
 				xhr.responseType && response === null 
-					? onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED, xhr) 
+					? onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED) 
 					: onSuccess(response);
 			} else {
-				onError(ERROR_CODE.HTTP_STATUS_ERROR, xhr);
+				onError(ERROR_CODE.HTTP_STATUS_ERROR);
 			}
 		});
 

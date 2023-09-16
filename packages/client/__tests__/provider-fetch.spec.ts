@@ -9,6 +9,7 @@ describe('fetch.ts', async () => {
 
 	it('Get', async () => {
 		const response = await Network.http(serverUrl);
+		expect(typeof response.headers['content-length']).toBe('string');
 		expect(response.body.url).toBe('/');
 		expect(response.body.method).toBe('GET');
 		expect(response.status).toBe(200);

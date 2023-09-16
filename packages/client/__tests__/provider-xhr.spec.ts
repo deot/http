@@ -1,6 +1,7 @@
 import { createInstance } from '@deot/http-client';
 import * as Server from './fixtures/server';
 
+// @vitest-environment jsdom
 describe('xhr.ts', async () => {
 	const serverUrl = await Server.impl();
 	const Network = createInstance({
@@ -10,6 +11,7 @@ describe('xhr.ts', async () => {
 
 	it('Get', async () => {
 		const response = await Network.http(serverUrl);
+		expect(typeof response.headers['content-length']).toBe('string');
 		expect(response.body.url).toBe('/');
 		expect(response.body.method).toBe('GET');
 		expect(response.status).toBe(200);

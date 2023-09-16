@@ -4,24 +4,37 @@ import * as url from 'node:url';
 import followRedirects from 'follow-redirects';
 
 import type { HTTPProvider } from "@deot/http-core";
-import { HTTPResponse, ERROR_CODE } from "@deot/http-core";
+import { HTTPHeaders, HTTPResponse, ERROR_CODE } from "@deot/http-core";
 
 const { http: httpFollow, https: httpsFollow } = followRedirects;
 
 export const provider: HTTPProvider = (request, leaf) => {
 	return new Promise((resolve, reject) => {
 		let timer: any;
+
+		let response: http.IncomingMessage; 
+
+		const getExtra = () => {
+			return {
+				status: response?.statusCode,
+				headers: new HTTPHeaders(response?.headers)
+			};
+		};
+
 		const onError = (statusText: string, body$?: any) => {
-			if (body$) {
-				body$.status = body$.statusCode;
-			}
-			reject(HTTPResponse.error(statusText, body$));
+			reject(HTTPResponse.error(statusText, {
+				...getExtra(),
+				body: body$
+			}));
 			timer && clearTimeout(timer);
 			timer = null;
 		};
 
 		const onSuccess = (body$: any) => {
-			resolve(new HTTPResponse({ body: body$ }));
+			resolve(new HTTPResponse({ 
+				...getExtra(),
+				body: body$ 
+			}));
 			timer && clearTimeout(timer);
 			timer = null;
 		};
@@ -57,6 +70,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 			headers: headers.toJSON(),
 			...requestOptions
 		}, (res) => {
+			response = res;
 			if (!res.statusCode || req.destroyed) return;
 			if (res.statusCode >= 200 && res.statusCode < 300) {
 				// 可以通过onResponse对stream进行转换
@@ -74,7 +88,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 						maxContentLength > -1 
 						&& Buffer.concat(responseBuffer).length > maxContentLength
 					) {
-						onError('HTTP_CONTENT_EXCEEDED', res);
+						onError('HTTP_CONTENT_EXCEEDED');
 					}
 				});
 
@@ -93,7 +107,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 					onSuccess(result);
 				});
 			} else {
-				onError(ERROR_CODE.HTTP_STATUS_ERROR, res);
+				onError(ERROR_CODE.HTTP_STATUS_ERROR);
 			}
 		});
 
