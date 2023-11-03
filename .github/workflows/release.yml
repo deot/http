@@ -84,10 +84,10 @@ jobs:
           version: 8
           run_install: false
 
-      - name: Set node version to 20
+      - name: Set node version to latest
         uses: actions/setup-node@v3
         with:
-          node-version: 20.5.1
+          node-version: latest
           cache: 'pnpm'
 
       - name: Checkout main
