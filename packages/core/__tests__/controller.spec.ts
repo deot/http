@@ -21,7 +21,7 @@ describe('controller.ts', () => {
 	});
 
 	it('baseURL/apis', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const baseURL = 'https://xxx.com';
 		const apis = {
 			A_GET: '/api.json'
@@ -46,7 +46,7 @@ describe('controller.ts', () => {
 	});
 
 	it('error, empty url', async () => {
-		expect.assertions(6);
+		expect.hasAssertions();
 
 		try {
 			await Network.http('', {});
@@ -70,7 +70,7 @@ describe('controller.ts', () => {
 	});
 
 	it('error, body', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		try {
 			await Network.http('xxx', {
 				reject: true,
@@ -83,7 +83,7 @@ describe('controller.ts', () => {
 	});
 
 	it('timeout', async () => {
-		expect.assertions(6);
+		expect.hasAssertions();
 		try {
 			await Network.http('xxx', {
 				timeout: 100
@@ -218,7 +218,7 @@ describe('controller.ts', () => {
 	});
 
 	it('localData', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const body = {
 			status: 1,
 			data: {}
@@ -231,7 +231,7 @@ describe('controller.ts', () => {
 	});
 
 	it('onResponse, error', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const message = new Error('any');
 		try {
 			await Network.http('xxx', {
@@ -245,7 +245,7 @@ describe('controller.ts', () => {
 	});
 
 	it('onResponse, success', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const body = {
 			status: 1,
 			data: {}
@@ -260,7 +260,7 @@ describe('controller.ts', () => {
 	});
 
 	it('onResponse, error, HttpResponse', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const body = {
 			status: 1,
 			data: {}
@@ -277,7 +277,7 @@ describe('controller.ts', () => {
 	});
 
 	it('onRequest, error', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const message = new Error('any');
 		try {
 			await Network.http('xxx', {
@@ -291,7 +291,7 @@ describe('controller.ts', () => {
 	});
 
 	it('onRequest, success', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const body = {
 			status: 1,
 			data: {}
@@ -306,7 +306,7 @@ describe('controller.ts', () => {
 	});
 
 	it('onRequest, success, HttpResponse', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		const body = {
 			status: 1,
 			data: {}

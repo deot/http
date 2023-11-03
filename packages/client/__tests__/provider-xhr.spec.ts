@@ -119,7 +119,7 @@ describe('xhr.ts', async () => {
 	});
 
 	it('responseType: json, error', async () => {
-		expect.assertions(1);
+		expect.hasAssertions();
 		try {
 			await Network.http(serverUrl, {
 				method: 'POST',
