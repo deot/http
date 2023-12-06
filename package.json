@@ -38,6 +38,6 @@
   },
   "homepage": "https://github.com/deot/http#readme",
   "devDependencies": {
-    "@deot/dev": "^2.6.1"
+    "@deot/dev": "^2.7.0"
   }
 }
