@@ -18,13 +18,12 @@ describe('headers.ts', () => {
 		headers.set('c', null, true);
 		expect(headers.toJSON()).toEqual({ b: 'b' });
 
-		headers.set({ 'b': null });
+		headers.set({ b: null });
 		expect(headers.toJSON()).toEqual({ b: 'b' });
 
-		headers.set({ 'b': null }, true);
+		headers.set({ b: null }, true);
 		expect(headers.toJSON()).toEqual({});
 
 		expect(Object.prototype.toString.call(headers)).toBe(`[object HTTPHeaders]`);
 	});
-
 });

@@ -1,13 +1,13 @@
 import { getUid } from './utils';
-import { HTTPRequest } from "./request";
-import type { HTTPResponse } from "./response";
+import { HTTPRequest } from './request';
+import type { HTTPResponse } from './response';
 
 type PromiseHook<T> = (response: HTTPResponse<T>) => any;
 export class HTTPShellLeaf<T = any> {
 	id = getUid(`shell.leaf`);
 
 	cancel!: () => Promise<void>;
- 
+
 	timeout?: ReturnType<typeof global.setTimeout>;
 
 	/**

@@ -35,7 +35,7 @@ export class HTTPResponse<T = {} | BodyInit | null> {
 	// Custom
 
 	constructor(
-		body?: BodyInit | null | HTTPResponse<T> | HTTPResponseOptions, 
+		body?: BodyInit | null | HTTPResponse<T> | HTTPResponseOptions,
 		options?: HTTPResponseOptions
 	) {
 		const defaults = {
@@ -51,13 +51,13 @@ export class HTTPResponse<T = {} | BodyInit | null> {
 		};
 
 		const isBodyAsOptions = body && (body.constructor === Object || body instanceof HTTPResponse);
-		const kv = isBodyAsOptions 
-			? { ...defaults, ...(body as (HTTPResponse<T> | HTTPResponseOptions)), ...options } 
+		const kv = isBodyAsOptions
+			? { ...defaults, ...(body as (HTTPResponse<T> | HTTPResponseOptions)), ...options }
 			: { ...defaults, body, ...options };
 
 		Object.keys(kv).forEach((key) => {
-			let v = typeof kv[key] !== 'undefined' 
-				? kv[key] 
+			const v = typeof kv[key] !== 'undefined'
+				? kv[key]
 				: defaults[key];
 			this[key] = key === 'headers' ? new HTTPHeaders(v) : v;
 		});

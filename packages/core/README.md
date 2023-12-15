@@ -20,7 +20,7 @@ const Network = new HTTPController({
 	onRequest(leaf) {
 		const request = new HTTPRequest(leaf.request);
 		if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
-			let [key, query] = request.url.split('?'); // 避免before带上?token=*之类
+			const [key, query] = request.url.split('?'); // 避免before带上?token=*之类
 			request.url = `${apis[key] ? `${baseURL}${apis[key]}` : ''}${query ? `?${query}` : ''}`;
 		}
 		return request;

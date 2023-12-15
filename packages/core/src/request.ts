@@ -72,7 +72,7 @@ export class HTTPRequest {
 	provider!: HTTPProvider;
 
 	constructor(
-		url: string | HTTPRequest | HTTPRequestOptions, 
+		url: string | HTTPRequest | HTTPRequestOptions,
 		options?: HTTPRequestOptions,
 		parent?: HTTPRequest
 	) {
@@ -97,12 +97,12 @@ export class HTTPRequest {
 			provider: defaultProvider
 		};
 		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HTTPRequest);
-		const kv = isUrlAsOptions 
-			? { ...defaults, ...parent, ...(url as (HTTPRequest | HTTPRequestOptions)), ...options } 
+		const kv = isUrlAsOptions
+			? { ...defaults, ...parent, ...(url as (HTTPRequest | HTTPRequestOptions)), ...options }
 			: { ...defaults, ...parent, url, ...options };
 
 		Object.keys(kv).forEach((key) => {
-			const v = typeof kv[key] !== 'undefined' 
+			const v = typeof kv[key] !== 'undefined'
 				? kv[key]
 				: defaults[key];
 			this[key] = key === 'headers' ? new HTTPHeaders(v) : v;

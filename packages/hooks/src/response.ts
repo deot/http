@@ -3,7 +3,7 @@ import * as Is from '@deot/helper-is';
 
 export const onResponse: HTTPHook = (leaf) => {
 	let { body } = leaf.response!;
-	
+
 	if (Is.string(body)) {
 		try {
 			body = JSON.parse(body.toString());

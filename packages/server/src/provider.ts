@@ -3,8 +3,8 @@ import * as https from 'node:https';
 import * as url from 'node:url';
 import followRedirects from 'follow-redirects';
 
-import type { HTTPProvider } from "@deot/http-core";
-import { HTTPHeaders, HTTPResponse, ERROR_CODE } from "@deot/http-core";
+import type { HTTPProvider } from '@deot/http-core';
+import { HTTPHeaders, HTTPResponse, ERROR_CODE } from '@deot/http-core';
 
 const { http: httpFollow, https: httpsFollow } = followRedirects;
 
@@ -12,7 +12,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 	return new Promise((resolve, reject) => {
 		let timer: any;
 
-		let response: http.IncomingMessage; 
+		let response: http.IncomingMessage;
 
 		const getExtra = () => {
 			return {
@@ -31,21 +31,21 @@ export const provider: HTTPProvider = (request, leaf) => {
 		};
 
 		const onSuccess = (body$: any) => {
-			resolve(new HTTPResponse({ 
+			resolve(new HTTPResponse({
 				...getExtra(),
-				body: body$ 
+				body: body$
 			}));
 			timer && clearTimeout(timer);
 			timer = null;
 		};
 
-		const { 
+		const {
 			url: url$,
-			maxRedirects, 
-			responseType, 
-			maxContentLength = Infinity, 
-			body, 
-			method, 
+			maxRedirects,
+			responseType,
+			maxContentLength = Infinity,
+			body,
+			method,
 			headers,
 			timeout,
 			...requestOptions
@@ -62,7 +62,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 			transport = isHttps ? httpsFollow : httpFollow;
 		}
 
-		let req = transport.request({
+		const req = transport.request({
 			method,
 			hostname,
 			port,
@@ -78,14 +78,14 @@ export const provider: HTTPProvider = (request, leaf) => {
 					onSuccess(res);
 					return;
 				}
-								
-				let responseBuffer: any[] = [];
+
+				const responseBuffer: any[] = [];
 				res.on('data', (chunk) => {
 					responseBuffer.push(chunk);
 
 					// 如果指定，请确保内容长度不超过maxContentLength
 					if (
-						maxContentLength > -1 
+						maxContentLength > -1
 						&& Buffer.concat(responseBuffer).length > maxContentLength
 					) {
 						onError('HTTP_CONTENT_EXCEEDED');
@@ -98,7 +98,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 				});
 
 				res.on('end', () => {
-					let responseData = Buffer.concat(responseBuffer);
+					const responseData = Buffer.concat(responseBuffer);
 					let result: Buffer | string = responseData;
 					if (responseType !== 'arraybuffer') {
 						result = responseData.toString('utf8');
@@ -125,7 +125,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 		};
 
 		leaf.server = req;
-		
+
 		// body instanceof Readable
 		if (body && typeof (body as any).pipe === 'function') {
 			(body as any).pipe(req);

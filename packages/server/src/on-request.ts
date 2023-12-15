@@ -5,8 +5,9 @@ import { formDataToStream, readBlob } from './helper';
 
 // 针对服务端要额外做处理
 export const onRequest: HTTPHook = (leaf) => {
-	let { body, headers } = leaf.request;
-	
+	const { body: originalBody, headers } = leaf.request;
+
+	let body = originalBody;
 	if (!(Is.buffer(body) || Is.stream(body) || Is.string(body) || !body)) {
 		if (Is.arrayBuffer(body)) {
 			body = Buffer.from(new Uint8Array(body as ArrayBuffer));
@@ -18,7 +19,7 @@ export const onRequest: HTTPHook = (leaf) => {
 				}
 			);
 		} else if (Is.blob(body) || Is.file(body)) {
-			let original = body as Blob;
+			const original = body as Blob;
 			if (original.size) {
 				headers.set('Content-Type', original.type || 'application/octet-stream', true);
 			}

@@ -57,7 +57,7 @@ describe('hooks.ts', async () => {
 		formData.append('response', Data.responseString);
 		// escapeName
 		formData.append('blob"', Data.blobWithoutType);
-		
+
 		const response = await Network.http(`${serverUrl}`, {
 			method: 'POST',
 			body: formData,

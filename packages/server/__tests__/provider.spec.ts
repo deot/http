@@ -26,7 +26,7 @@ describe('provider.ts', async () => {
 				data: {}
 			}
 		};
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			timeout: 0,
 			method: 'POST',
 			body
@@ -46,7 +46,7 @@ describe('provider.ts', async () => {
 	 * 以这样的形式 /user/:id
 	 */
 	it('Delete', async () => {
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'DELETE'
 		});
 
@@ -59,11 +59,10 @@ describe('provider.ts', async () => {
 
 	it('Delete，Bad Request', async () => {
 		try {
-			await Network.http(serverUrl, { 
+			await Network.http(serverUrl, {
 				method: 'DELETE',
 				body: 'any'
 			});
-
 		} catch (e: any) {
 			expect(e.status).toBe(400);
 		}
@@ -76,7 +75,7 @@ describe('provider.ts', async () => {
 				data: {}
 			}
 		};
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'PUT',
 			body
 		});
@@ -98,7 +97,7 @@ describe('provider.ts', async () => {
 	});
 
 	it('headers', async () => {
-		let headers = {};
+		const headers = {};
 		// eslint-disable-next-line no-proto
 		(headers as any).__proto__['Cookie'] = 'any';
 		await Network.http(`${serverUrl}`, {
@@ -107,7 +106,7 @@ describe('provider.ts', async () => {
 	});
 
 	it('headers, null', async () => {
-		let headers = {};
+		const headers = {};
 		// eslint-disable-next-line no-proto
 		(headers as any)['Cookie'] = null;
 		await Network.http(`${serverUrl}`, {
@@ -120,7 +119,6 @@ describe('provider.ts', async () => {
 			await Network.http(`${serverUrl}`, {
 				maxContentLength: 10
 			});
-			
 		} catch (e: any) {
 			expect(e.statusText).toBe('HTTP_CONTENT_EXCEEDED');
 		}
@@ -128,7 +126,7 @@ describe('provider.ts', async () => {
 
 	it('cancel', async () => {
 		try {
-			const leaf = Network.http(serverUrl, { 
+			const leaf = Network.http(serverUrl, {
 				method: 'PUT',
 			});
 			setTimeout(() => leaf.cancel());
@@ -149,7 +147,7 @@ describe('provider.ts', async () => {
 		stream.push(JSON.stringify(body));
 		stream.push(null); // no more data
 
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'POST',
 			body: stream
 		});
@@ -194,7 +192,7 @@ describe('provider.ts', async () => {
 			}
 		};
 
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'POST',
 			body,
 			responseType: 'arraybuffer'
@@ -211,20 +209,20 @@ describe('provider.ts', async () => {
 			}
 		};
 
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'POST',
 			body,
 			responseType: 'stream'
 		});
 
 		const data = await new Promise((resolve) => {
-			let responseBuffer: any[] = [];
+			const responseBuffer: any[] = [];
 			response.body.on('data', (chunk) => {
 				responseBuffer.push(chunk);
 			});
 
 			response.body.on('end', () => {
-				let responseData = Buffer.concat(responseBuffer);
+				const responseData = Buffer.concat(responseBuffer);
 				resolve(JSON.parse(responseData.toString('utf8')));
 			});
 		});

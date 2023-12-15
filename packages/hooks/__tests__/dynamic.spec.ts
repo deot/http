@@ -3,12 +3,11 @@ import { onRequest, onResponse } from '@deot/http-hooks';
 
 describe('common.ts', async () => {
 	const Network = new HTTPController({
-		provider: async (request) => (new HTTPResponse({ body: { url: request.url } })),
+		provider: async request => (new HTTPResponse({ body: { url: request.url } })),
 		onRequest,
 		onResponse
 	});
 
-	
 	it('dynamic, baseUrl', async () => {
 		const baseUrl = `https://example.com`;
 		try {

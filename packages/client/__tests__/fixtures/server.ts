@@ -6,11 +6,11 @@ import formidable from 'formidable';
 
 const createServer = async (port: number, host: string) => {
 	return new Promise((resolve) => {
-		let server = http
+		const server = http
 			.createServer(async (req, res) => {
-				// 处理CORS 
-				res.setHeader('Access-Control-Allow-Origin', "*");
-				res.setHeader('Access-Control-Allow-Credentials', "*");
+				// 处理CORS
+				res.setHeader('Access-Control-Allow-Origin', '*');
+				res.setHeader('Access-Control-Allow-Credentials', '*');
 				res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
 				res.setHeader('Access-Control-Allow-Headers', '*');
 
@@ -39,16 +39,16 @@ const createServer = async (port: number, host: string) => {
 				}
 
 				// 也可以用searchParams
-				let query = (url.parse(req.url!).query || '')
+				const query = (url.parse(req.url!).query || '')
 					.split('&')
 					.filter(i => !!i)
 					.reduce((pre, cur) => {
-						let [key, value] = cur.split('=');
+						const [key, value] = cur.split('=');
 
 						pre[key] = decodeURIComponent(value);
 						return pre;
 					}, {});
-				
+
 				let body = {};
 
 				if (req.method === 'POST' || req.method === 'DELETE' || req.method === 'PUT') {
@@ -60,7 +60,7 @@ const createServer = async (port: number, host: string) => {
 								.then(([fields, files]) => {
 									let response = JSON.parse(fields?.response?.[0] || null);
 									if (!response && files && Object.keys(files).length) {
-										let file = files[Object.keys(files)[0]][0];
+										const file = files[Object.keys(files)[0]][0];
 										response = JSON.parse(fs.readFileSync(file.filepath).toString())?.response;
 									}
 									resolve$({ response });
@@ -69,10 +69,10 @@ const createServer = async (port: number, host: string) => {
 									resolve$({ response: { status: 0, body: e } });
 								});
 							return;
-						} 
+						}
 
 						let postData = '';
-						req.on('data', chunk => {  
+						req.on('data', (chunk) => {
 							postData += chunk;
 						});
 						req.on('end', async () => {
@@ -80,7 +80,7 @@ const createServer = async (port: number, host: string) => {
 								resolve$(JSON.parse(postData.toString() || '{}'));
 							} catch (e) {
 								try {
-									let data = new URLSearchParams(postData.toString());
+									const data = new URLSearchParams(postData.toString());
 									resolve$({ response: JSON.parse(data.get('response')!) });
 								} catch {
 									resolve$({ response: { status: 0 } });
@@ -90,17 +90,17 @@ const createServer = async (port: number, host: string) => {
 					});
 				}
 
-				let { 
-					delay = 0.1, 
-					response = JSON.stringify({ 
-						method: req.method, 
+				const {
+					delay = 0.1,
+					response = JSON.stringify({
+						method: req.method,
 						url: req.url,
 						reuqest: body
 					})
 				} = { ...query, ...body };
 
-				response = typeof response === 'string' ? response : JSON.stringify(response);
-				setTimeout(() => res.end(response), delay * 1000);
+				const response$ = typeof response === 'string' ? response : JSON.stringify(response);
+				setTimeout(() => res.end(response$), delay * 1000);
 			});
 
 		server.listen({ port, host }, () => {
@@ -126,7 +126,6 @@ export const impl = async () => {
 
 	return baseUrl;
 };
-
 
 if (typeof beforeAll === 'undefined') {
 	(async () => {

@@ -1,23 +1,22 @@
-import type { HTTPProvider } from "@deot/http-core";
-import { HTTPRequest, HTTPResponse, HTTPHeaders, HTTPShellLeaf, ERROR_CODE } from "@deot/http-core";
+import type { HTTPProvider } from '@deot/http-core';
+import { HTTPRequest, HTTPResponse, HTTPHeaders, HTTPShellLeaf, ERROR_CODE } from '@deot/http-core';
 
 export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf) => {
 	return new Promise((resolve, reject) => {
 		const { url, headers, body, credentials, method, timeout, responseType, ...fetchOptions } = request;
 
-
 		const controller = new AbortController();
 
-		let timer = timeout 
+		let timer = timeout
 			? setTimeout(() => {
 				controller.abort();
 				onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
 			}, timeout)
 			: null;
-		let response: Response; 
+		let response: Response;
 
 		const getExtra = () => {
-			let headers$ = new HTTPHeaders();
+			const headers$ = new HTTPHeaders();
 			if (response) {
 				response.headers.forEach((v, k) => headers$.set(k, v, true));
 			}
@@ -37,9 +36,9 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 		};
 
 		const onSuccess = (body$: any) => {
-			resolve(new HTTPResponse({ 
+			resolve(new HTTPResponse({
 				...getExtra(),
-				body: body$ 
+				body: body$
 			}));
 			timer && clearTimeout(timer);
 			timer = null;
@@ -60,7 +59,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 		}).then((res) => {
 			response = res;
 			if (res.status >= 200 && res.status < 300) {
-				let fn = res[responseType || 'text'];
+				const fn = res[responseType || 'text'];
 				if (!fn) return onSuccess(res);
 				fn.call(res)
 					.then((data: any) => {
@@ -76,7 +75,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 			return res;
 		}).catch((e) => {
 			onError(ERROR_CODE.HTTP_STATUS_ERROR, e);
-			// no throw again, avoid unhandled error 
+			// no throw again, avoid unhandled error
 		});
 
 		// rebuild cancel

@@ -26,7 +26,7 @@ describe('fetch.ts', async () => {
 				data: {}
 			}
 		};
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			timeout: 0,
 			method: 'POST',
 			body
@@ -47,7 +47,7 @@ describe('fetch.ts', async () => {
 				data: {}
 			}
 		};
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'DELETE',
 			body
 		});
@@ -67,7 +67,7 @@ describe('fetch.ts', async () => {
 				data: {}
 			}
 		};
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'PUT',
 			body
 		});
@@ -82,7 +82,7 @@ describe('fetch.ts', async () => {
 
 	it('timeout', async () => {
 		try {
-			await Network.http(serverUrl, { 
+			await Network.http(serverUrl, {
 				method: 'PUT',
 				timeout: 100
 			});
@@ -93,7 +93,7 @@ describe('fetch.ts', async () => {
 
 	it('cancel', async () => {
 		try {
-			const leaf = Network.http(serverUrl, { 
+			const leaf = Network.http(serverUrl, {
 				method: 'PUT',
 			});
 			setTimeout(() => leaf.cancel());
@@ -141,7 +141,7 @@ describe('fetch.ts', async () => {
 	});
 
 	it('headers', async () => {
-		let headers = {};
+		const headers = {};
 		// eslint-disable-next-line no-proto
 		(headers as any).__proto__['Cookie'] = 'any';
 		(headers as any)['Cookies'] = '';

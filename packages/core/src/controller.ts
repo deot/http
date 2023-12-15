@@ -1,8 +1,8 @@
-import type { HTTPRequestOptions } from "./request";
-import { HTTPRequest } from "./request";
+import type { HTTPRequestOptions } from './request';
+import { HTTPRequest } from './request';
 
-import { HTTPShell } from "./shell";
-import type { HTTPShellLeaf } from "./shell-leaf";
+import { HTTPShell } from './shell';
+import type { HTTPShellLeaf } from './shell-leaf';
 
 export class HTTPController {
 	request: HTTPRequest;
@@ -17,12 +17,12 @@ export class HTTPController {
 
 	/**
 	 * 发起一个请求，返回Promise<HttpResponse>
-	 * @param {string|HTTPRequest|HTTPRequestOptions} url ~
-	 * @param {HTTPRequestOptions} requestOptions ~
-	 * @returns {HTTPShellLeaf} ~
+	 * @param url ~
+	 * @param requestOptions ~
+	 * @returns ~
 	 */
 	http<T = any>(
-		url: string | HTTPRequest | HTTPRequestOptions, 
+		url: string | HTTPRequest | HTTPRequestOptions,
 		requestOptions?: HTTPRequestOptions,
 	): HTTPShellLeaf<T> {
 		const shell = new HTTPShell<T>(url, requestOptions, this);
@@ -32,12 +32,12 @@ export class HTTPController {
 
 	/**
 	 * 发起一个请求，返回HttpShell, 支持单个重复发送，取消操作
-	 * @param {string|HTTPRequest|HTTPRequestOptions} url ~
-	 * @param {HTTPRequestOptions} requestOptions ~
-	 * @returns {HTTPShell} ~
+	 * @param url ~
+	 * @param requestOptions ~
+	 * @returns ~
 	 */
 	custom<T = any>(
-		url: string | HTTPRequest | HTTPRequestOptions, 
+		url: string | HTTPRequest | HTTPRequestOptions,
 		requestOptions?: HTTPRequestOptions,
 	): HTTPShell<T> {
 		const shell = new HTTPShell<T>(url, requestOptions, this);
@@ -47,7 +47,7 @@ export class HTTPController {
 
 	/**
 	 * 取消所有请求或取消指定请求
-	 * @param {string|HTTPShellLeaf} id ~
+	 * @param id ~
 	 */
 	async cancel(id?: string | HTTPShellLeaf) {
 		await this.shells.reduce((pre, shell) => {

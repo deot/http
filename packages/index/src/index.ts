@@ -1,6 +1,6 @@
-import type { HTTPController, HTTPRequestOptions } from "@deot/http-core";
-import * as ServerAdapter from "@deot/http-server";
-import * as ClientAdapter from "@deot/http-client";
+import type { HTTPController, HTTPRequestOptions } from '@deot/http-core';
+import * as ServerAdapter from '@deot/http-server';
+import * as ClientAdapter from '@deot/http-client';
 
 interface Adapter {
 	createInstance: (options: HTTPRequestOptions) => HTTPController;

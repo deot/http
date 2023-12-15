@@ -1,13 +1,13 @@
 /* eslint-disable no-promise-executor-return */
 /* eslint-disable no-dupe-class-members */
 /* eslint-disable lines-between-class-members */
-import type { HTTPController } from "./controller";
+import type { HTTPController } from './controller';
 
-import { HTTPRequest } from "./request";
-import { HTTPResponse } from "./response";
-import { HTTPShellLeaf } from "./shell-leaf";
+import { HTTPRequest } from './request';
+import { HTTPResponse } from './response';
+import { HTTPShellLeaf } from './shell-leaf';
 import { ERROR_CODE } from './error';
-import type { HTTPRequestOptions, HTTPHook } from "./request";
+import type { HTTPRequestOptions, HTTPHook } from './request';
 
 export class HTTPShell<T = any> {
 	parent: HTTPController;
@@ -19,7 +19,7 @@ export class HTTPShell<T = any> {
 	isPending = false; // 用于控制多个send时，只执行一次onStart/onFinish
 
 	constructor(
-		url: string | HTTPRequest | HTTPRequestOptions, 
+		url: string | HTTPRequest | HTTPRequestOptions,
 		requestOptions: HTTPRequestOptions | undefined,
 		parent: HTTPController
 	) {
@@ -37,7 +37,7 @@ export class HTTPShell<T = any> {
 		const cancel = new Promise((_, reject) => {
 			leaf.cancel = async () => {
 				reject(this.error(leaf, ERROR_CODE.HTTP_CANCEL));
-				await new Promise<void>(resolve => { 
+				await new Promise<void>((resolve) => {
 					leaf.target.catch(() => {}).finally(resolve);
 				});
 			};
@@ -88,7 +88,7 @@ export class HTTPShell<T = any> {
 							.then(onSuccess)
 							.catch(onError);
 					}
-					
+
 					return isError ? onError(error || response) : onSuccess(response);
 				});
 		});
@@ -106,7 +106,7 @@ export class HTTPShell<T = any> {
 			pre = pre
 				.then(() => {
 					if (!needBreak) {
-						let result = fn(leaf);
+						const result = fn(leaf);
 						// leaf含then方法是基于leaf.target 所以不能直接返回leaf
 						return result === leaf || result;
 					}
@@ -140,8 +140,8 @@ export class HTTPShell<T = any> {
 
 	/**
 	 * 请求完成后清理，避免内存泄漏
-	 * @param {string|HTTPShellLeaf} id 当前请求或当前请求id
-	 * @returns {Promise<void>} ~
+	 * @param id 当前请求或当前请求id
+	 * @returns ~
 	 */
 	async cancel(id?: string | HTTPShellLeaf<T>): Promise<void> {
 		if (id) {
@@ -159,8 +159,8 @@ export class HTTPShell<T = any> {
 
 	/**
 	 * 请求前完成触发，在onRequest之前
-	 * @param {HTTPShellLeaf} leaf 当前请求
-	 * @returns {Promise<void>} ~
+	 * @param leaf 当前请求
+	 * @returns ~
 	 */
 	async loading(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { localData, onStart } = leaf.originalRequest;
@@ -173,8 +173,8 @@ export class HTTPShell<T = any> {
 
 	/**
 	 * 请求完成触发, 在onResponse之后
-	 * @param {HTTPShellLeaf} leaf 当前请求
-	 * @returns {Promise<void>} ~
+	 * @param leaf 当前请求
+	 * @returns ~
 	 */
 	async loaded(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { localData, onFinish } = leaf.originalRequest;
@@ -188,13 +188,13 @@ export class HTTPShell<T = any> {
 
 	/**
 	 * 请求前处理，可修改请求信息，或根据结果全局事务
-	 * @param {HTTPShellLeaf} leaf 当前请求
-	 * @returns {Promise<void>} ~
+	 * @param leaf 当前请求
+	 * @returns ~
 	 */
 	async before(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { onRequest } = leaf.originalRequest;
 
-		try {			
+		try {
 			await this.task(leaf, onRequest, (result: any) => {
 				let request: HTTPRequest;
 				if (result instanceof HTTPRequest) {
@@ -217,16 +217,16 @@ export class HTTPShell<T = any> {
 
 	/**
 	 * 请求后处理，可修改返回信息，或根据结果全局事务
-	 * @param {HTTPShellLeaf} leaf 当前请求
-	 * @returns {Promise<void>} ~
+	 * @param leaf 当前请求
+	 * @returns ~
 	 */
 	async after(leaf: HTTPShellLeaf<T>): Promise<void> {
 		const { localData, onResponse, provider } = leaf.request!;
-		
-		let target = localData 
-			? Promise.resolve(new HTTPResponse({ body: localData })) 
+
+		const target = localData
+			? Promise.resolve(new HTTPResponse({ body: localData }))
 			: provider(leaf.request!, leaf);
-		
+
 		let originalResponse: HTTPResponse<T>;
 
 		try {
@@ -258,10 +258,10 @@ export class HTTPShell<T = any> {
 
 	/**
 	 * 错误处理
-	 * @param {HTTPShellLeaf} leaf 当前请求
-	 * @param {string} statusText Error Code
-	 * @param {any} body exception
-	 * @returns {HTTPResponse} ~
+	 * @param leaf 当前请求
+	 * @param statusText Error Code
+	 * @param body exception
+	 * @returns ~
 	 */
 	error(leaf: HTTPShellLeaf<T>, statusText: string, body?: any): HTTPResponse {
 		return HTTPResponse.error(statusText, {

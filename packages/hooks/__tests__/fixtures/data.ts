@@ -39,8 +39,8 @@ export const string = JSON.stringify(json);
 export const blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
 export const blobWithoutType = new Blob([JSON.stringify(json)]);
 export const blobWithoutContent = new Blob();
-export const file = new File([JSON.stringify(json)], "foo.json", {
-	type: "application/json",
+export const file = new File([JSON.stringify(json)], 'foo.json', {
+	type: 'application/json',
 });
 
 export const formData = new FormData();

@@ -1,5 +1,5 @@
-import type { HTTPProvider } from "@deot/http-core";
-import { HTTPHeaders, HTTPResponse, ERROR_CODE } from "@deot/http-core";
+import type { HTTPProvider } from '@deot/http-core';
+import { HTTPHeaders, HTTPResponse, ERROR_CODE } from '@deot/http-core';
 
 const ignoreDuplicateOf = {
 	'age': !0,
@@ -32,12 +32,12 @@ const parseHeaders = (rawHeaders: string) => {
 		key = line.substring(0, i).trim().toLowerCase();
 		val = line.substring(i + 1).trim();
 
-		/* istanbul ignore next -- @preserve */ 
+		/* istanbul ignore next -- @preserve */
 		if (!key || (parsed[key] && ignoreDuplicateOf[key])) {
 			return;
 		}
 
-		 /* istanbul ignore next -- @preserve */ 
+		/* istanbul ignore next -- @preserve */
 		if (key === 'set-cookie') {
 			if (parsed[key]) {
 				parsed[key].push(val);
@@ -56,8 +56,8 @@ export const provider: HTTPProvider = (request, leaf) => {
 	return new Promise((resolve, reject) => {
 		const { onDownloadProgress, onUploadProgress, responseType, timeout, credentials, body, headers, method, url, async = true } = request;
 
-		let xhr = new XMLHttpRequest();
-		
+		const xhr = new XMLHttpRequest();
+
 		const getExtra = () => {
 			return {
 				status: xhr.status,
@@ -73,9 +73,9 @@ export const provider: HTTPProvider = (request, leaf) => {
 		};
 
 		const onSuccess = (body$: any) => {
-			resolve(new HTTPResponse({ 
+			resolve(new HTTPResponse({
 				...getExtra(),
-				body: body$ 
+				body: body$
 			}));
 		};
 
@@ -91,12 +91,12 @@ export const provider: HTTPProvider = (request, leaf) => {
 			) return;
 
 			if (xhr.status >= 200 && xhr.status < 300) {
-				const response = !xhr.responseType 
-					? xhr.responseText 
+				const response = !xhr.responseType
+					? xhr.responseText
 					: xhr.response;
 
-				xhr.responseType && response === null 
-					? onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED) 
+				xhr.responseType && response === null
+					? onError(ERROR_CODE.HTTP_RESPONSE_PARSING_FAILED)
 					: onSuccess(response);
 			} else {
 				onError(ERROR_CODE.HTTP_STATUS_ERROR);
@@ -113,7 +113,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 		/* istanbul ignore next -- @preserve */
 		xhr.withCredentials = credentials === 'omit' ? false : !!credentials;
 		timeout && (xhr.timeout = timeout);
-		responseType && (xhr.responseType = responseType); 
+		responseType && (xhr.responseType = responseType);
 
 		for (const h in headers.toJSON()) {
 			xhr.setRequestHeader(h, headers[h]);

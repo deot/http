@@ -13,8 +13,8 @@ export class HTTPHeaders {
 	set(key: string, value: any, rewrite?: boolean): HTTPHeaders;
 	set(keyOrHeaders: string | Headers, valueOrRewrite: any, rewrite?: boolean) {
 		if (typeof keyOrHeaders === 'string') {
-			let key = keyOrHeaders;
-			let value = valueOrRewrite;
+			const key = keyOrHeaders;
+			const value = valueOrRewrite;
 			this[key] = rewrite ? value : (this[key] || value);
 		} else {
 			let headers = keyOrHeaders;
@@ -26,7 +26,7 @@ export class HTTPHeaders {
 				headers = { ...headers };
 			}
 
-			Object.keys(headers).forEach(k => {
+			Object.keys(headers).forEach((k) => {
 				this.set(k, headers[k], rewrite);
 			});
 		}

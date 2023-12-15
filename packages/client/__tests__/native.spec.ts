@@ -7,11 +7,11 @@ describe.skip('request.ts', async () => {
 	const launch = E2E.impl();
 	const baseUrl = `file://${resolve(__dirname, './fixtures/native.html')}`;
 	const methods = [
-		'string', 
-		'blob', 
-		'file', 
-		'formData', 
-		'arrayBuffer', 
+		'string',
+		'blob',
+		'file',
+		'formData',
+		'arrayBuffer',
 		'files',
 		'URLSearchParams'
 	];
@@ -28,7 +28,7 @@ describe.skip('request.ts', async () => {
 					task$ = task$
 						.then(() => operater.setValue(`#${id}`, api))
 						.then(() => page.waitForResponse(v => v.url() === api))
-						.then((e) => e.json())
+						.then(e => e.json())
 						.then((e) => {
 							expect(e).toEqual({ status: 1, data: {} });
 						});

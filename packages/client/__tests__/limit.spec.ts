@@ -9,7 +9,7 @@ describe('limit.ts', async () => {
 			const { body } = leaf.response!;
 
 			if (
-				!body 
+				!body
 				|| (body && typeof body.status !== 'number')
 			) {
 				leaf.response!.statusText = `response.body must be a json.`;
@@ -43,7 +43,7 @@ describe('limit.ts', async () => {
 				data: {}
 			}
 		};
-		const response = await Network.http(serverUrl, { 
+		const response = await Network.http(serverUrl, {
 			method: 'POST',
 			body
 		});
@@ -64,7 +64,7 @@ describe('limit.ts', async () => {
 			}
 		};
 		try {
-			await Network.http(serverUrl, { 
+			await Network.http(serverUrl, {
 				method: 'POST',
 				body
 			});
@@ -81,7 +81,7 @@ describe('limit.ts', async () => {
 			}
 		};
 		try {
-			await Network.http(serverUrl, { 
+			await Network.http(serverUrl, {
 				method: 'POST',
 				body
 			});

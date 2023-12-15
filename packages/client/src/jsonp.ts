@@ -1,5 +1,5 @@
-import type { HTTPProvider } from "@deot/http-core";
-import { HTTPRequest, HTTPResponse, ERROR_CODE } from "@deot/http-core";
+import type { HTTPProvider } from '@deot/http-core';
+import { HTTPRequest, HTTPResponse, ERROR_CODE } from '@deot/http-core';
 
 export const provider: HTTPProvider = (request: HTTPRequest) => {
 	return new Promise((resolve, reject) => {
@@ -13,8 +13,8 @@ export const provider: HTTPProvider = (request: HTTPRequest) => {
 			value: (body: any) => resolve(new HTTPResponse({ body }))
 		});
 
-		let script = document.createElement("script");
-		let head = document.getElementsByTagName("head")[0];
+		const script = document.createElement('script');
+		const head = document.getElementsByTagName('head')[0];
 
 		script.src = url;
 		head.appendChild(script);

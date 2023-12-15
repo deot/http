@@ -5,8 +5,8 @@ describe('controller.ts', () => {
 		provider: (request: HTTPRequest) => {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
-					request.reject 
-						? reject(HTTPResponse.error('', request)) 
+					request.reject
+						? reject(HTTPResponse.error('', request))
 						: resolve(new HTTPResponse({ body: request.body }));
 				}, 300);
 			});
@@ -30,7 +30,7 @@ describe('controller.ts', () => {
 			onRequest(leaf) {
 				const request = new HTTPRequest(leaf.request);
 				if (request.url && !/[a-zA-z]+:\/\/[^\s]*/.test(request.url)) {
-					let [key, query] = request.url.split('?'); // 避免before带上?token=*之类
+					const [key, query] = request.url.split('?'); // 避免before带上?token=*之类
 					request.url = `${apis[key] ? `${baseURL}${apis[key]}` : ''}${query ? `?${query}` : ''}`;
 				}
 
@@ -180,7 +180,7 @@ describe('controller.ts', () => {
 		shell.send().catch((e) => {
 			expect(e.statusText).toBe('HTTP_CANCEL');
 		});
-		
+
 		await Network.cancel();
 		expect(Network.shells.length).toBe(0);
 		expect(Object.keys(shell.leafs).length).toBe(0);
@@ -194,7 +194,7 @@ describe('controller.ts', () => {
 		leaf.catch((e) => {
 			expect(e.statusText).toBe('HTTP_CANCEL');
 		});
-		
+
 		await Network.cancel();
 		expect(Network.shells.length).toBe(0);
 		expect(Object.keys(shell.leafs).length).toBe(0);
@@ -341,7 +341,7 @@ describe('controller.ts', () => {
 
 	it('maxTries', async () => {
 		let count = 0;
-		let maxTries = 10;
+		const maxTries = 10;
 		const body = {
 			status: 1,
 			data: {}

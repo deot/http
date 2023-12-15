@@ -27,7 +27,7 @@ class FormDataPart {
 		if (isStringValue) {
 			value = textEncoder.encode(String(value).replace(/\r?\n|\r\n?/g, CRLF));
 		} else {
-			headers += `Content-Type: ${value.type || "application/octet-stream"}${CRLF}`;
+			headers += `Content-Type: ${value.type || 'application/octet-stream'}${CRLF}`;
 		}
 
 		this.headers = textEncoder.encode(headers + CRLF);
@@ -45,7 +45,7 @@ class FormDataPart {
 		if (Is.typedArray(value)) {
 			yield value;
 		} else {
-			yield* readBlob(value);
+			yield * readBlob(value);
 		}
 		yield CRLF_BYTES;
 	}
@@ -63,7 +63,7 @@ class FormDataPart {
 
 export const formDataToStream = (form: FormData, headersHandler?: any, options?: any) => {
 	const boundary = options?.boundary || 'form-data-boundary-' + generateString(25);
-	
+
 	const boundaryBytes = textEncoder.encode('--' + boundary + CRLF);
 	const footerBytes = textEncoder.encode('--' + boundary + '--' + CRLF + CRLF);
 	let contentLength = footerBytes.byteLength;
@@ -89,7 +89,7 @@ export const formDataToStream = (form: FormData, headersHandler?: any, options?:
 	return Readable.from((async function* () {
 		for (const part of parts) {
 			yield boundaryBytes;
-			yield* part.encode();
+			yield * part.encode();
 		}
 		yield footerBytes;
 	})());
