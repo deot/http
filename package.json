@@ -15,7 +15,8 @@
     "update": "ddc update",
     "test": "ddc test",
     "add": "ddc add",
-    "release": "ddc release"
+    "release": "ddc release",
+    "typecheck": "tsc --noEmit --skipLibCheck"
   },
   "scripts-info": {
     "init": "首次安装",
