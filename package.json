@@ -7,9 +7,8 @@
     "prepare": "husky install",
     "init": "npx pnpm install",
     "init:force": "rm -rf ./node_modules pnpm-lock.yaml ./packages/*/node_modules && npm run init",
-    "lint": "esw packages --ext .js,.ts,.jsx,.tsx,.md --color",
+    "lint": "eslint . --color",
     "lint:fix": "npm run lint -- --fix",
-    "lint:watch": "npm run lint -- --watch --fix",
     "link": "ddc link",
     "dev": "ddc dev",
     "build": "ddc build --script-formats=es,cjs,umd,iife --node-package '@deot/http-server,@deot/http'",
@@ -38,6 +37,6 @@
   },
   "homepage": "https://github.com/deot/http#readme",
   "devDependencies": {
-    "@deot/dev": "^2.7.0"
+    "@deot/dev": "^2.8.7"
   }
 }
