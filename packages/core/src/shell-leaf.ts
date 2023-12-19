@@ -43,7 +43,7 @@ export class HTTPShellLeaf<T = any> {
 		this.request = new HTTPRequest(request);
 	}
 
-	then(resolve: PromiseHook<T>, reject: PromiseHook<T>) {
+	then(resolve: PromiseHook<T>, reject?: PromiseHook<T>) {
 		return this.target.then(resolve, reject);
 	}
 
