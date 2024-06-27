@@ -1,6 +1,6 @@
 {
   "name": "@deot/http-hooks",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,6 +23,6 @@
     "@deot/helper-utils": "^1.1.1"
   },
   "devDependencies": {
-    "@deot/http-core": "^1.1.1"
+    "@deot/http-core": "^1.1.2"
   }
 }

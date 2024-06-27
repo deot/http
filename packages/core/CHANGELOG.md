@@ -1,5 +1,13 @@
 # @deot/http-core ChangeLog
 
+## v1.1.2
+
+_2024-06-27_
+
+### Features
+
+- feat: expose response's headers ([8d5952f](https://github.com/deot/http/commit/8d5952fa329aa481478ed6dab8c643d0dc2370ad))
+
 ## v1.1.1
 
 _2023-08-25_

@@ -1,6 +1,6 @@
 {
   "name": "@deot/http-client",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,8 +21,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/http-core": "^1.1.1",
-    "@deot/http-hooks": "^1.1.1"
+    "@deot/http-core": "^1.1.2",
+    "@deot/http-hooks": "^1.1.2"
   },
   "devDependencies": {
     "formidable": "^3.5.0"
