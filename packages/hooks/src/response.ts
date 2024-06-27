@@ -7,7 +7,7 @@ export const onResponse: HTTPHook = (leaf) => {
 	if (Is.string(body)) {
 		try {
 			body = JSON.parse(body.toString());
-		} catch { /* empty */ }
+		} catch (_) { /* empty */ }
 	}
 
 	leaf.response!.body = body;
