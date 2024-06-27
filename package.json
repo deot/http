@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "custom http client",
   "type": "module",
+  "packageManager": "pnpm@latest",
   "scripts": {
     "prepare": "husky install",
     "init": "npx pnpm install",
