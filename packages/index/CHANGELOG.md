@@ -1,5 +1,13 @@
 # @deot/http ChangeLog
 
+## v1.1.3
+
+_2024-06-28_
+
+### Updates
+
+- chore(client,hooks,server): deps updated ([ec1074f](https://github.com/deot/http/commit/ec1074f17df87aba700f28e12d617f27c4fef5dd))
+
 ## v1.1.2
 
 _2024-06-27_
