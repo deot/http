@@ -25,6 +25,6 @@
     "@deot/http-hooks": "^1.1.2"
   },
   "devDependencies": {
-    "formidable": "^3.5.0"
+    "formidable": "^3.5.1"
   }
 }

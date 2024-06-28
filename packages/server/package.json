@@ -19,10 +19,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/helper-is": "^1.1.1",
-    "@deot/helper-utils": "^1.1.1",
+    "@deot/helper-is": "^1.1.3",
+    "@deot/helper-utils": "^1.1.4",
     "@deot/http-core": "^1.1.2",
     "@deot/http-hooks": "^1.1.2",
-    "follow-redirects": "^1.15.2"
+    "follow-redirects": "^1.15.6"
   }
 }
