@@ -1,5 +1,13 @@
 # @deot/http-server ChangeLog
 
+## v1.1.4
+
+_2024-07-07_
+
+### Features
+
+- feat(core): support share the same request ([43eb327](https://github.com/deot/http/commit/43eb327b9ee1ff484ec0354f578cf95605a8e963))
+
 ## v1.1.3
 
 _2024-06-28_
