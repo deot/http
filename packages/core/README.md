@@ -4,7 +4,7 @@
 
 在[Request/MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Request)基础上新增api
 
-> 可全局注册或单词注册
+> 可全局注册或单次注册
 
 - `provider`: 适配任何端的网络控制
 - `localData`: 本地mock
