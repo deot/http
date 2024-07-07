@@ -33,6 +33,8 @@ export interface HTTPRequestOptions {
 	maxTries?: number;
 	// 仅当maxTries > 1 是有效, 可配合做轮询请求
 	interval?: number;
+	// 共享Key值（共享同一个HTTPShellLeaf）
+	shared?: any;
 
 	// 提供者/适配器
 	provider?: HTTPProvider;
@@ -69,6 +71,7 @@ export class HTTPRequest {
 	timeout!: number;
 	maxTries!: number;
 	interval!: number;
+	shared = null;
 	provider!: HTTPProvider;
 
 	constructor(
@@ -94,6 +97,7 @@ export class HTTPRequest {
 			timeout: 60000,
 			maxTries: 1,
 			interval: 0,
+			shared: null,
 			provider: defaultProvider
 		};
 		const isUrlAsOptions = url && (url.constructor === Object || url instanceof HTTPRequest);

@@ -29,6 +29,10 @@ export class HTTPShell<T = any> {
 
 	// 发起请求
 	send(): HTTPShellLeaf<T> {
+		const leafKeys = Object.keys(this.leafs);
+		if (this.request.shared && leafKeys.length) {
+			return this.leafs[leafKeys[0]];
+		}
 		this.parent._add(this);
 
 		const leaf = new HTTPShellLeaf<T>(this.request);
@@ -128,6 +132,14 @@ export class HTTPShell<T = any> {
 
 		await this.loaded(leaf);
 
+		if (this.request.shared) return;
+
+		this.clearByLeafId(id);
+	}
+
+	clearByLeafId(id: string) {
+		const leaf = this.leafs[id];
+
 		// clear keyValue
 		Object.keys(leaf).forEach(key => delete leaf[key]);
 		delete this.leafs[id];
@@ -135,6 +147,19 @@ export class HTTPShell<T = any> {
 		// 当都已经完成时，通知父层移除以减少占用
 		if (!Object.keys(this.leafs).length) {
 			this.parent._remove(this);
+		}
+	}
+
+	// `@internal`
+	async removeIfShared(shared?: any) {
+		if (
+			this.request.shared
+				&& (
+					!shared
+					|| this.request.shared === shared
+				)
+		) {
+			this.clearByLeafId(Object.keys(this.leafs)[0]);
 		}
 	}
 

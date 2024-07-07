@@ -16,7 +16,8 @@ export class HTTPController {
 	}
 
 	/**
-	 * 发起一个请求，返回Promise<HttpResponse>
+	 * 主动发起一个请求，返回HTTPShellLeaf<T>(符合Promise A+, 且支持取消操作)
+	 * 其中T为响应的结果
 	 * @param url ~
 	 * @param requestOptions ~
 	 * @returns ~
@@ -25,13 +26,13 @@ export class HTTPController {
 		url: string | HTTPRequest | HTTPRequestOptions,
 		requestOptions?: HTTPRequestOptions,
 	): HTTPShellLeaf<T> {
-		const shell = new HTTPShell<T>(url, requestOptions, this);
+		const shell = this._getShell<T>(url, requestOptions);
 
 		return shell.send();
 	}
 
 	/**
-	 * 发起一个请求，返回HttpShell, 支持单个重复发送，取消操作
+	 * 封装一个请求，返回HttpShell, 支持单个重复发送，取消操作
 	 * @param url ~
 	 * @param requestOptions ~
 	 * @returns ~
@@ -40,7 +41,7 @@ export class HTTPController {
 		url: string | HTTPRequest | HTTPRequestOptions,
 		requestOptions?: HTTPRequestOptions,
 	): HTTPShell<T> {
-		const shell = new HTTPShell<T>(url, requestOptions, this);
+		const shell = this._getShell<T>(url, requestOptions);
 
 		return shell;
 	}
@@ -56,8 +57,42 @@ export class HTTPController {
 		}, Promise.resolve());
 
 		if (!id) {
-			this.shells = [];
+			this.shells = this.shells.filter(i => !!i.request.shared);
 		}
+	}
+
+	/**
+	 * 清理shared
+	 * @param shared ~
+	 */
+	async removeShared(shared?: any) {
+		await this.shells.reduce((pre, shell) => {
+			pre = pre.then(() => shell.removeIfShared(shared));
+			return pre;
+		}, Promise.resolve());
+	}
+
+	async clear() {
+		await this.cancel();
+		await this.removeShared();
+	}
+
+	// `@internal`
+	_getShell<T>(
+		url: string | HTTPRequest | HTTPRequestOptions,
+		requestOptions?: HTTPRequestOptions,
+	): HTTPShell<T> {
+		let shell = new HTTPShell<T>(url, requestOptions, this);
+		if (shell.request.shared) {
+			shell = this.shells.find((shell$) => {
+				return (
+					shell$.request.shared === shell.request.shared
+					&& JSON.stringify(shell$.request) === JSON.stringify(shell.request)
+				);
+			}) || shell;
+		}
+
+		return shell;
 	}
 
 	// `@internal`

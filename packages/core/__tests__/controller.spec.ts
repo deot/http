@@ -1,3 +1,4 @@
+import { Utils } from '@deot/dev-test';
 import { HTTPController, HTTPRequest, HTTPResponse } from '@deot/http-core';
 
 describe('controller.ts', () => {
@@ -8,7 +9,7 @@ describe('controller.ts', () => {
 					request.reject
 						? reject(HTTPResponse.error('', request))
 						: resolve(new HTTPResponse({ body: request.body }));
-				}, 300);
+				}, 20);
 			});
 		}
 	});
@@ -86,7 +87,7 @@ describe('controller.ts', () => {
 		expect.hasAssertions();
 		try {
 			await Network.http('xxx', {
-				timeout: 100
+				timeout: 10
 			});
 		} catch (e: any) {
 			expect(Network.shells.length).toBe(0);
@@ -435,5 +436,110 @@ describe('controller.ts', () => {
 		});
 
 		expect(count).toBe(1);
+	});
+
+	it('shared', async () => {
+		const shared = 'any';
+		let count = 0;
+		const fn = () => {
+			return Network.http('xxx', {
+				shared,
+				onStart: () => {
+					count++;
+				}
+			});
+		};
+
+		await Promise.all(Array.from({ length: 4 }).map(fn));
+		expect(count).toBe(1);
+		expect(Network.shells.length).toBe(1);
+
+		await Network.removeShared();
+		await Promise.all(Array.from({ length: 4 }).map(fn));
+		expect(count).toBe(2);
+		expect(Network.shells.length).toBe(1);
+
+		await Network.removeShared(shared);
+		await Promise.all(Array.from({ length: 4 }).map(fn));
+		expect(count).toBe(3);
+		expect(Network.shells.length).toBe(1);
+
+		await Network.removeShared(shared);
+		expect(Network.shells.length).toBe(0);
+	});
+
+	it('shared/body', async () => {
+		const shared = 'any';
+		let count = 0;
+		const fn = (body: any) => {
+			return Network.http('xxx', {
+				shared,
+				body,
+				onStart: () => {
+					count++;
+				}
+			});
+		};
+
+		await Promise.all(Array.from({ length: 4 }).map((_, index) => fn({ index: index % 2 })));
+		expect(count).toBe(2);
+		expect(Network.shells.length).toBe(2);
+
+		await Network.removeShared();
+		expect(Network.shells.length).toBe(0);
+	});
+
+	it('shared/cancel', async () => {
+		const shared = 'any';
+		let count = 0;
+		const fn = () => {
+			return Network.http('xxx', {
+				shared,
+				onStart: () => {
+					count++;
+				}
+			});
+		};
+
+		const requests = Array.from({ length: 4 }).map(fn);
+		await Network.cancel();
+		expect(Network.shells.length).toBe(1);
+
+		try {
+			await Promise.all(requests);
+		} catch (e) {
+			expect(count).toBe(1);
+		}
+		await Network.clear();
+		expect(Network.shells.length).toBe(0);
+	});
+
+	it('shared/coverage', async () => {
+		const shared = 'any';
+		let count = 0;
+		const fn = () => {
+			return Network.http('xxx', {
+				shared,
+				onStart: () => {
+					count++;
+				}
+			});
+		};
+
+		Network.http('xxx', {
+			onResponse: async () => {
+				await Utils.sleep(10);
+			}
+		});
+
+		await Promise.all(Array.from({ length: 4 }).map(fn));
+		expect(count).toBe(1);
+		expect(Network.shells.length).toBe(2);
+
+		await Network.removeShared();
+		expect(Network.shells.length).toBe(1);
+
+		await Utils.sleep(10);
+		expect(Network.shells.length).toBe(0);
 	});
 });
