@@ -127,12 +127,12 @@ export class HTTPShell<T = any> {
 
 	// `@internal`
 	async clear(leaf: HTTPShellLeaf<T>): Promise<void> {
-		const { timeout, id } = leaf;
+		const { timeout, id, response } = leaf;
 		timeout && clearTimeout(timeout);
 
 		await this.loaded(leaf);
 
-		if (this.request.shared) return;
+		if (response?.type !== 'error' && this.request.shared) return;
 
 		this.clearByLeafId(id);
 	}

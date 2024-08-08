@@ -468,6 +468,7 @@ describe('controller.ts', () => {
 		expect(Network.shells.length).toBe(0);
 	});
 
+	// 相同的shared，也支持参数的不同（目前是通过JSON.stringify）
 	it('shared/body', async () => {
 		const shared = 'any';
 		let count = 0;
@@ -512,6 +513,29 @@ describe('controller.ts', () => {
 		}
 		await Network.clear();
 		expect(Network.shells.length).toBe(0);
+	});
+
+	// 当失败时会清理shared
+	it('shared/error', async () => {
+		const shared = 'error';
+		let count = 0;
+		const fn = (body: any) => {
+			return Network.http('xxx', {
+				shared,
+				body,
+				reject: true,
+				onStart: () => {
+					count++;
+				}
+			});
+		};
+
+		try {
+			await Promise.allSettled(Array.from({ length: 4 }).map((_, index) => fn({ index: index % 2 })));
+		} catch (e) {
+			expect(count).toBe(2);
+			expect(Network.shells.length).toBe(0);
+		};
 	});
 
 	it('shared/coverage', async () => {
