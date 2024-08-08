@@ -85,10 +85,10 @@ export class HTTPController {
 		let shell = new HTTPShell<T>(url, requestOptions, this);
 		if (shell.request.shared) {
 			shell = this.shells.find((shell$) => {
-				return (
-					shell$.request.shared === shell.request.shared
-					&& JSON.stringify(shell$.request) === JSON.stringify(shell.request)
-				);
+				if (shell$.request.shared !== shell.request.shared) return false;
+				try {
+					return JSON.stringify(shell$.request) === JSON.stringify(shell.request);
+				} catch (_) { /* empty */ }
 			}) || shell;
 		}
 
