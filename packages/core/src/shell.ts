@@ -152,14 +152,16 @@ export class HTTPShell<T = any> {
 
 	// `@internal`
 	async removeIfShared(shared?: any) {
+		let id: string;
 		if (
 			this.request.shared
-				&& (
-					!shared
-					|| this.request.shared === shared
-				)
+			&& (
+				!shared
+				|| this.request.shared === shared
+			)
+			&& (id = Object.keys(this.leafs)[0])
 		) {
-			this.clearByLeafId(Object.keys(this.leafs)[0]);
+			this.clearByLeafId(id);
 		}
 	}
 

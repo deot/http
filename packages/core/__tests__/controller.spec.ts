@@ -542,4 +542,16 @@ describe('controller.ts', () => {
 		await Utils.sleep(10);
 		expect(Network.shells.length).toBe(0);
 	});
+
+	it('shared/clear multiple', async () => {
+		const shared = 'multiple';
+		const fn = () => {
+			return Network.http('xxx', {
+				shared,
+			});
+		};
+		await Promise.all(Array.from({ length: 4 }).map(fn));
+		await Promise.all(Array.from({ length: 4 }).map(() => Network.removeShared(shared)));
+		expect(Network.shells.length).toBe(0);
+	});
 });
