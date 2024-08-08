@@ -1,5 +1,13 @@
 # @deot/http-core ChangeLog
 
+## v1.1.4
+
+_2024-08-08_
+
+### Bugfixes
+
+- fix: throw error when remove shared twice ([3ad2c53](https://github.com/deot/http/commit/3ad2c534a3aae2d5c24587d56b9d398837b32a1b))
+
 ## v1.1.3
 
 _2024-07-07_
