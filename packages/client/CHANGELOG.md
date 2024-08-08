@@ -1,5 +1,14 @@
 # @deot/http-client ChangeLog
 
+## v1.1.6
+
+_2024-08-08_
+
+### Bugfixes
+
+- fix(core): avoid throw on circular references ([75a65b0](https://github.com/deot/http/commit/75a65b0237236ee661fefdb14e6bf7fd8041547d))
+- fix(core): request again when shared fail ([bbcf14e](https://github.com/deot/http/commit/bbcf14ebf63f68c9d2386df57b5126b76e59e493))
+
 ## v1.1.5
 
 _2024-08-08_
