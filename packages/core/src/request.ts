@@ -41,7 +41,10 @@ export interface HTTPRequestOptions {
 }
 
 const defaultProvider = (request: HTTPRequest) => new HTTPResponse({ body: request.body }); // TODO: 也可以考虑抛出错误
-export type HTTPHook<T = any> = (leaf: HTTPShellLeaf) => T;
+export type HTTPHook<T = any> = (leaf: HTTPShellLeaf) => T | {
+	enforce: 'pre' | 'post';
+	handler: (leaf: HTTPShellLeaf) => T;
+};
 export class HTTPRequest {
 	// Allow Extra KeyValue
 	[key: string]: any;

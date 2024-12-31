@@ -8,6 +8,7 @@ import { HTTPResponse } from './response';
 import { HTTPShellLeaf } from './shell-leaf';
 import { ERROR_CODE } from './error';
 import type { HTTPRequestOptions, HTTPHook } from './request';
+import { sortHooks } from './utils';
 
 export class HTTPShell<T = any> {
 	parent: HTTPController;
@@ -106,7 +107,7 @@ export class HTTPShell<T = any> {
 		if (!fns.length) return;
 
 		let needBreak = false;
-		return fns.reduce((pre, fn) => {
+		return sortHooks(fns).reduce((pre, fn) => {
 			pre = pre
 				.then(() => {
 					if (!needBreak) {
