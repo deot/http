@@ -135,10 +135,11 @@ fix(index): ci tag (#2)
 fix(shared): error (close #1)
 ```
 
-##### `Commit`无影响的格式
+##### `Commit`无影响的格式, 即跳过收集至`CHANGELOG`
 
 ```shell
 fix: invaild commit
+feat: [index] skip collect commit
 ```
 
 ## 关联

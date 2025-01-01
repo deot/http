@@ -65,6 +65,25 @@ shell.send();
 await shell.cancel();
 ```
 
+### 扩展
+
+#### `on*`执行顺序
+
+```ts
+type HTTPHook<T = any> = (leaf: HTTPShellLeaf) => T | {
+	enforce: 'pre' | 'post' | null;
+	handler: (leaf: HTTPShellLeaf) => T;
+};
+```
+- 带有`enforce: 'pre'`的用户钩子
+- 带有`enforce: 'pre'`的全局钩子
+- 没有`enforce`的用户钩子
+- 没有`enforce`的全局钩子
+- 带有`enforce: 'post'`的用户钩子
+- 带有`enforce: 'post'`的全局钩子
+
+### 其他
+
 - [HTTPRequestOptions](./src/request.ts)
 - [HTTPRequest](./src/request.ts)
 - [HTTPResponse](./src/response.ts)
