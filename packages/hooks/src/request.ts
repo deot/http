@@ -7,6 +7,17 @@ const XContentType = 'application/x-www-form-urlencoded'; // ['urlencoded', 'for
 const MContentType = `multipart/form-data`;
 
 /**
+ * 过滤掉值为null, undefined情况
+ * @param v ~
+ * @returns ~
+ */
+const isValid = (v: any) => {
+	return v
+		|| v === false
+		|| v === 0
+		|| v === '';
+};
+/**
  * 如: { response: { status: 1 } }
  * 当前转义：response=%7B%22status%22%3A1%7D
  * axios转义：response%5Bstatus%5D=1 (reponse[status]=1)
@@ -16,15 +27,7 @@ const MContentType = `multipart/form-data`;
 const toURLEncodedForm = (body: {}): string => {
 	const results: string[] = [];
 	for (const key in body) {
-		/**
-		 * 过滤掉值为null, undefined情况
-		 */
-		if (
-			body[key]
-			|| body[key] === false
-			|| body[key] === 0
-			|| body[key] === ''
-		) {
+		if (isValid(body[key])) {
 			results.push(key + '=' + encodeURIComponent(Is.plainObject(body[key]) ? JSON.stringify(body[key]) : body[key]));
 		}
 	}
@@ -134,7 +137,9 @@ export const onRequest: HTTPHook = (leaf) => {
 							args[1] = JSON.stringify(args[1]);
 						}
 
-						(body as FormData).append.apply(body, args);
+						if (isValid(args[1])) {
+							(body as FormData).append.apply(body, args);
+						}
 					});
 				} else {
 					headers.set('Content-Type', JContentType, false);
