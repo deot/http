@@ -117,7 +117,7 @@ export const onRequest: HTTPHook = (leaf) => {
 				Array.from((original as FileList)).forEach((file: File) => {
 					(body as any).append('files[]', file);
 				});
-			} else if (Is.plainObject(body)) {
+			} else if (Is.plainObject(body) || Is.array(body)) { // => Is.object(body)
 				if (contentType.includes(XContentType)) {
 					body = toURLEncodedForm(body as {});
 				} else if (contentType.includes(MContentType)) {
@@ -144,7 +144,6 @@ export const onRequest: HTTPHook = (leaf) => {
 				body = JSON.stringify(body);
 			}
 		}
-
 		if (!Is.formData(body) && ['post', 'put', 'patch'].includes(type)) {
 			headers.set('Content-Type', XContentType, false);
 		}

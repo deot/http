@@ -217,4 +217,63 @@ describe('xhr.ts', async () => {
 
 		expect(response.status).toBe(200);
 	});
+
+	it('Post, Array', async () => {
+		const response = await Network.http(`${serverUrl}`, {
+			method: 'POST',
+			body: [1, 2],
+			onResponse(leaf) {
+				expect(leaf.originalRequest.headers['Content-Type']).toBe(undefined);
+				expect(leaf.request.headers['Content-Type']).toBe(JContentType);
+			}
+		});
+
+		expect(response.status).toBe(200);
+	});
+
+	it('Post, Array/XContentType', async () => {
+		const response = await Network.http(`${serverUrl}`, {
+			method: 'POST',
+			body: [1, 2],
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			onResponse(leaf) {
+				expect(leaf.originalRequest.headers['Content-Type']).toBe(XContentType);
+				expect(leaf.request.headers['Content-Type']).toBe(XContentType);
+				expect(leaf.request.body).toBe('0=1&1=2');
+			}
+		});
+
+		expect(response.status).toBe(200);
+	});
+
+	it('Post, Number', async () => {
+		const response = await Network.http(`${serverUrl}`, {
+			method: 'POST',
+			body: 1,
+			onResponse(leaf) {
+				expect(leaf.request.body).toBe('1');
+				expect(leaf.request.headers['Content-Type']).toBe(XContentType);
+			}
+		});
+
+		expect(response.status).toBe(200);
+	});
+
+	it('Post, Number/JContentType', async () => {
+		const response = await Network.http(`${serverUrl}`, {
+			method: 'POST',
+			body: 1,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			onResponse(leaf) {
+				expect(leaf.request.headers['Content-Type']).toBe(JContentType);
+				expect(leaf.request.body).toBe('1');
+			}
+		});
+
+		expect(response.status).toBe(200);
+	});
 });
