@@ -15,7 +15,7 @@
 - `onStart`: 发起回调
 - `onFinish`: 结束回调
 - `onRequest`: 请求拦截
-- `onReponse`: 响应拦截
+- `onResponse`: 响应拦截
 - `[custom]`: 自行定义的api, 可以在`on*`的回调中做特殊处理
 
 ```ts
@@ -75,6 +75,7 @@ type HTTPHook<T = any> = (leaf: HTTPShellLeaf) => T | {
 	handler: (leaf: HTTPShellLeaf) => T;
 };
 ```
+
 - 带有`enforce: 'pre'`的用户钩子
 - 带有`enforce: 'pre'`的全局钩子
 - 没有`enforce`的用户钩子
