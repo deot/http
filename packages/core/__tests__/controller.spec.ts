@@ -538,6 +538,29 @@ describe('controller.ts', () => {
 		};
 	});
 
+	it('shared/cancelAfterRemove', async () => {
+		const shared = 'any';
+		let result = '';
+		try {
+			await Network.http('xxx', {
+				shared,
+				onStart() {
+					result += 'a';
+				},
+				onFinish() {
+					result += 'b';
+				},
+				onResponse() {
+					Network.removeShared(shared);
+					Network.clear();
+				}
+			});
+		} catch (e: any) {
+			expect(result).toBe('ab');
+			expect(e.statusText).toBe('HTTP_CANCEL');
+		}
+	});
+
 	it('shared/coverage', async () => {
 		const shared = 'any';
 		let count = 0;

@@ -140,6 +140,7 @@ export class HTTPShell<T = any> {
 
 	clearByLeafId(id: string) {
 		const leaf = this.leafs[id];
+		if (!leaf) return;
 
 		// clear keyValue
 		Object.keys(leaf).forEach(key => delete leaf[key]);
@@ -156,12 +157,13 @@ export class HTTPShell<T = any> {
 		let id: string;
 		if (
 			this.request.shared
-				&& (
-					!shared
-					|| this.request.shared === shared
-				)
-				&& (id = Object.keys(this.leafs)[0])
+			&& (
+				!shared
+				|| this.request.shared === shared
+			)
+			&& (id = Object.keys(this.leafs)[0])
 		) {
+			await this.cancel(id);
 			this.clearByLeafId(id);
 		}
 	}
