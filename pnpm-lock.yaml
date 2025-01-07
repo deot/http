@@ -15,10 +15,10 @@ importers:
   packages/client:
     dependencies:
       '@deot/http-core':
-        specifier: ^1.1.5
+        specifier: ^1.1.6
         version: link:../core
       '@deot/http-hooks':
-        specifier: ^1.1.6
+        specifier: ^1.1.7
         version: link:../hooks
     devDependencies:
       formidable:
@@ -37,20 +37,20 @@ importers:
         version: 1.1.4
     devDependencies:
       '@deot/http-core':
-        specifier: ^1.1.5
+        specifier: ^1.1.6
         version: link:../core
 
   packages/index:
     dependencies:
       '@deot/http-client':
-        specifier: ^1.1.6
+        specifier: ^1.1.7
         version: link:../client
       '@deot/http-server':
-        specifier: ^1.1.6
+        specifier: ^1.1.7
         version: link:../server
     devDependencies:
       '@deot/http-core':
-        specifier: ^1.1.5
+        specifier: ^1.1.6
         version: link:../core
 
   packages/server:
@@ -62,10 +62,10 @@ importers:
         specifier: ^1.1.4
         version: 1.1.4
       '@deot/http-core':
-        specifier: ^1.1.5
+        specifier: ^1.1.6
         version: link:../core
       '@deot/http-hooks':
-        specifier: ^1.1.6
+        specifier: ^1.1.7
         version: link:../hooks
       follow-redirects:
         specifier: ^1.15.6
@@ -1738,6 +1738,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:

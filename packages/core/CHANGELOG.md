@@ -1,5 +1,17 @@
 # @deot/http-core ChangeLog
 
+## v1.1.6
+
+_2025-01-07_
+
+### Bugfixes
+
+- fix: confirm cancel before remove shared ([0182706](https://github.com/deot/http/commit/01827065c560d71498288d319582fd42a59e8799))
+
+### Features
+
+- feat: enforce(pre|post) for hook ([6104509](https://github.com/deot/http/commit/6104509c129e0a944516d9af037e4ed90e0b7c8a))
+
 ## v1.1.5
 
 _2024-08-08_
