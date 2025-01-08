@@ -2,6 +2,14 @@ import { HTTPController, HTTPRequest, HTTPResponse } from '@deot/http-core';
 
 // onRequest, onResponse, onStart, onFinish
 describe('hooks-sequence', () => {
+	/**
+	 * 😈禁用toSorted方法，用以兼容更低版本;
+	 * 如果后续改用toSorted，那么项目中需要引入polyfill, 以下是简易版
+	 * Array.prototype.toSorted = Array.prototype.toSorted || function (fn) { return [...this].sort(fn); };
+	 */
+	Object.defineProperty(Array.prototype, 'toSorted', {
+		value: null
+	});
 	it('basic', async () => {
 		const keys = ['onRequest', 'onResponse', 'onStart', 'onFinish'];
 		const result: string[] = [];
