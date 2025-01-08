@@ -1,5 +1,13 @@
 # @deot/http-hooks ChangeLog
 
+## v1.1.8
+
+_2025-01-08_
+
+### Bugfixes
+
+- fix(core): compatible with lower versions ([2c237ba](https://github.com/deot/http/commit/2c237baf8deabff1fb41d8a5a1205389f34319b1))
+
 ## v1.1.7
 
 _2025-01-07_

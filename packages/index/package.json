@@ -1,6 +1,6 @@
 {
   "name": "@deot/http",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,10 +26,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/http-client": "^1.1.7",
-    "@deot/http-server": "^1.1.7"
+    "@deot/http-client": "^1.1.8",
+    "@deot/http-server": "^1.1.8"
   },
   "devDependencies": {
-    "@deot/http-core": "^1.1.6"
+    "@deot/http-core": "^1.1.7"
   }
 }
