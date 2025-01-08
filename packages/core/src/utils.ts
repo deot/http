@@ -30,8 +30,8 @@ const getHookSeq = (hook: HTTPHook) => {
  * @returns 排序过的钩子
  */
 export const sortHooks = <T>(v: HTTPHook<T>[]): Array<(leaf: HTTPShellLeaf) => T> => {
-	return v
-		.toSorted(((a, b) => getHookSeq(a) - getHookSeq(b)))
+	return [...v]
+		.sort(((a, b) => getHookSeq(a) - getHookSeq(b)))
 		.map((i) => {
 			if (typeof i === 'object') return (i as any).handler;
 			return i;
