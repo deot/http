@@ -25,7 +25,7 @@ jobs:
       - name: Setup cache for Chromium binary
         uses: actions/cache@v4
         with:
-          path: ~/.cache/puppeteer/chrome
+          path: ~/.cache/puppeteer
           key: chromium-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install pnpm
@@ -40,6 +40,7 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install
+      - run: node node_modules/puppeteer/install.mjs
 
       - name: Run typecheck
         run: npm run typecheck

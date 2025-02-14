@@ -23,6 +23,6 @@
     "@deot/helper-utils": "^1.1.4",
     "@deot/http-core": "^1.1.7",
     "@deot/http-hooks": "^1.1.8",
-    "follow-redirects": "^1.15.6"
+    "follow-redirects": "^1.15.9"
   }
 }
