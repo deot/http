@@ -9,9 +9,9 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 
 		let timer = timeout
 			? setTimeout(() => {
-				controller.abort();
-				onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
-			}, timeout)
+					controller.abort(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
+					onError(ERROR_CODE.HTTP_REQUEST_TIMEOUT);
+				}, timeout)
 			: null;
 		let response: Response;
 
@@ -74,6 +74,12 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 
 			return res;
 		}).catch((e) => {
+			/* istanbul ignore next -- @preserve */
+			if (e === ERROR_CODE.HTTP_CANCEL || ERROR_CODE.HTTP_REQUEST_TIMEOUT) {
+				onError(e);
+				return;
+			}
+			/* istanbul ignore next -- @preserve */
 			onError(ERROR_CODE.HTTP_STATUS_ERROR, e);
 			// no throw again, avoid unhandled error
 		});
@@ -81,7 +87,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 		// rebuild cancel
 		const originalCancel = leaf.cancel!;
 		leaf.cancel = async () => {
-			controller.abort();
+			controller.abort(ERROR_CODE.HTTP_CANCEL);
 			await originalCancel();
 		};
 
