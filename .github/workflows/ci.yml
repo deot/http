@@ -36,7 +36,7 @@ jobs:
       - name: Set node version to latest
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 22.16.0
           cache: 'pnpm'
 
       - run: pnpm install
