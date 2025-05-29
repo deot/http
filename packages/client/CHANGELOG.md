@@ -1,5 +1,17 @@
 # @deot/http-client ChangeLog
 
+## v1.1.9
+
+_2025-05-29_
+
+### Bugfixes
+
+- fix: abort with reason ([1f56be0](https://github.com/deot/http/commit/1f56be0cf761a831e0b4195603dfdb83b7a91835))
+
+### Updates
+
+- chore: deps updated ([eca0495](https://github.com/deot/http/commit/eca0495a695a55835be479e71c464e2d1b7a252e))
+
 ## v1.1.8
 
 _2025-01-08_

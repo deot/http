@@ -1,5 +1,13 @@
 # @deot/http-server ChangeLog
 
+## v1.1.9
+
+_2025-05-29_
+
+### Updates
+
+- chore: deps updated ([eca0495](https://github.com/deot/http/commit/eca0495a695a55835be479e71c464e2d1b7a252e))
+
 ## v1.1.8
 
 _2025-01-08_
