@@ -79,6 +79,7 @@ export const provider: HTTPProvider = (request, leaf) => {
 			}));
 		};
 
+		// 可以不用显式的使用removeEventListener, 经测试可以被垃圾回收
 		const on = (event: string, handler: any, target?: any) => {
 			target = target || xhr;
 			handler && target.addEventListener(event, handler);
