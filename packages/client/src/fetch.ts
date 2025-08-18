@@ -27,6 +27,9 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 		};
 
 		const onError = (statusText: string, body$?: any) => {
+			if ([ERROR_CODE.HTTP_CANCEL, ERROR_CODE.HTTP_REQUEST_TIMEOUT].includes(controller.signal.reason)) {
+				statusText = controller.signal.reason;
+			}
 			reject(HTTPResponse.error(statusText, {
 				...getExtra(),
 				body: body$
@@ -74,12 +77,7 @@ export const provider: HTTPProvider = (request: HTTPRequest, leaf: HTTPShellLeaf
 
 			return res;
 		}).catch((e) => {
-			/* istanbul ignore next -- @preserve */
-			if (e === ERROR_CODE.HTTP_CANCEL || e === ERROR_CODE.HTTP_REQUEST_TIMEOUT) {
-				onError(e);
-			} else {
-				onError(ERROR_CODE.HTTP_STATUS_ERROR, e);
-			}
+			onError(ERROR_CODE.HTTP_STATUS_ERROR, e);
 			// no throw again, avoid unhandled error
 		});
 
