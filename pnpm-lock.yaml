@@ -43,7 +43,7 @@ importers:
   packages/index:
     dependencies:
       '@deot/http-client':
-        specifier: ^1.1.9
+        specifier: ^1.1.10
         version: link:../client
       '@deot/http-server':
         specifier: ^1.1.9
@@ -3636,6 +3636,7 @@ packages:
   puppeteer@24.2.0:
     resolution: {integrity: sha512-z8vv7zPEgrilIbOo3WNvM+2mXMnyM9f4z6zdrB88Fzeuo43Oupmjrzk3EpuvuCtyK0A7Lsllfx7Z+4BvEEGJcQ==}
     engines: {node: '>=18'}
+    deprecated: < 24.9.0 is no longer supported
     hasBin: true
 
   queue-microtask@1.2.3:

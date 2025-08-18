@@ -1,5 +1,13 @@
 # @deot/http-client ChangeLog
 
+## v1.1.10
+
+_2025-08-18_
+
+### Bugfixes
+
+- fix: abort after response ([234d5a6](https://github.com/deot/http/commit/234d5a603a78fcbd051e9d7a1b5ac421cf7864f9))
+
 ## v1.1.9
 
 _2025-05-29_
