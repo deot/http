@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@deot/helper-is": "^1.1.3",
-    "@deot/helper-utils": "^1.1.4"
+    "@deot/helper-utils": "^1.1.8"
   },
   "devDependencies": {
     "@deot/http-core": "^1.1.7"

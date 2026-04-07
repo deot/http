@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "@deot/helper-is": "^1.1.3",
-    "@deot/helper-utils": "^1.1.4",
+    "@deot/helper-utils": "^1.1.8",
     "@deot/http-core": "^1.1.7",
     "@deot/http-hooks": "^1.1.8",
-    "follow-redirects": "^1.15.9"
+    "follow-redirects": "^1.15.11"
   }
 }

@@ -1,2 +1,9 @@
+shamefullyHoist: true
+
+linkWorkspacePackages: true
+
 packages:
   - 'packages/*'
+
+overrides:
+  "baseline-browser-mapping": "*"
