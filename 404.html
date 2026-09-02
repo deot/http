@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<!-- SPA 深链：写入 @deot/docs:redirect 后跳转入口，由 @deot/docs-client 消费。 -->
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script>
+		sessionStorage['@deot/docs:redirect'] = location.pathname + location.search + location.hash;
+	</script>
+	<meta http-equiv="refresh" content="0;URL='/http/'" />
+</head>
+<body></body>
+</html>

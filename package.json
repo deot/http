@@ -11,6 +11,7 @@
     "lint": "eslint . --color",
     "lint:fix": "npm run lint -- --fix",
     "link": "ddc link",
+    "docs:dev": "doc dev --workspace .",
     "dev": "ddc dev",
     "build": "ddc build --script-formats=es,cjs,umd,iife --node-package '@deot/http-server,@deot/http'",
     "update": "ddc update",
@@ -39,6 +40,7 @@
   },
   "homepage": "https://github.com/deot/http#readme",
   "devDependencies": {
-    "@deot/dev": "^2.9.10"
+    "@deot/dev": "^2.9.15",
+    "@deot/docs": "^1.0.9"
   }
 }
