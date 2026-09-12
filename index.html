@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>@deot/http 文档</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta charset="UTF-8">
+	<script>
+		const redirectKey = '@deot/http-site:redirect';
+		const redirect = sessionStorage.getItem(redirectKey);
+		if (redirect && /^\/(?!\/)/.test(redirect)) {
+			sessionStorage.removeItem(redirectKey);
+			history.replaceState(null, '', redirect);
+		}
+	</script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-client/dist/index.style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-renderer/dist/index.style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-markdown/dist/index.style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-playground/dist/index.style.css">
+</head>
+<body>
+	<div id="app"></div>
+	<script>
+		const repositoryRaw = 'https://raw.githubusercontent.com/deot/http/refs/heads/main/';
+		const repositoryBlob = 'https://github.com/deot/http/blob/main/';
+		const locales = {
+			'zh-CN': { label: '简体中文' },
+			'en-US': { label: 'English' }
+		};
+		const packages = [
+			{ label: 'index', value: 'index' },
+			{ label: 'core', value: 'core' },
+			{ label: 'client', value: 'client' },
+			{ label: 'server', value: 'server' },
+			{ label: 'hooks', value: 'hooks' },
+			{ label: 'shared', value: 'shared' }
+		];
+		const packageReadmes = Object.fromEntries(packages.map(item => [
+			item.value,
+			`packages/${item.value}/README.md`
+		]));
+		const readmes = { guide: 'README.md', ...packageReadmes };
+		const readmeRoutes = Object.fromEntries(Object.entries(readmes).flatMap(([value, source]) => {
+			const route = `/packages/${value}`;
+			if (value === 'guide') return [[source, route]];
+			const directory = `packages/${value}`;
+			return [
+				[source, route],
+				[directory, route],
+				[`${directory}/`, route]
+			];
+		}));
+		const localeReadmes = Object.fromEntries(Object.keys(locales).map(lang => [lang, readmes]));
+		const sidebars = Object.fromEntries(Object.keys(locales).map(lang => [
+			lang,
+			[
+				{
+					label: lang === 'zh-CN' ? '简介' : 'Introduction',
+					value: '/packages/guide'
+				},
+				{
+					label: 'Packages',
+					children: packages.map(item => ({
+						label: item.label,
+						value: `/packages/${item.value}`
+					}))
+				}
+			]
+		]));
+
+		const createHomeDocument = (lang) => {
+			const t = (zh, en) => (lang === 'zh-CN' ? zh : en);
+			const accent = '#2563eb';
+			const accentSecondary = '#14b8a6';
+			const accents = [accent, accentSecondary, '#f59e0b'];
+			const action = {
+				label: t('开始使用', 'Quick Start'),
+				to: `/${lang}/packages/guide`,
+				variant: 'solid',
+				size: 'large',
+				color: accent,
+				textColor: '#ffffff'
+			};
+			const stack = {
+				marginTop: 0,
+				marginBottom: 80,
+				paddingTop: 0,
+				paddingBottom: 0,
+				maxWidth: 1200
+			};
+			const block = (id, type, props, appearance = stack) => ({
+				id,
+				module: { type, version: 1, props },
+				appearance
+			});
+			const cards = items => items.map((item, index) => ({
+				...item,
+				icon: item.icon || String(index + 1).padStart(2, '0'),
+				accent: item.accent || accents[index]
+			}));
+
+			return {
+				schemaVersion: 2,
+				meta: { id: `http-home-${lang}`, title: '@deot/http' },
+				layout: {
+					mode: 'sortable',
+					maxWidth: 1920,
+					minHeight: 600,
+					background: '#ffffff'
+				},
+				blocks: [
+					block('home-hero', 'hero', {
+						eyebrow: '@deot/http',
+						title: t('一套 Core API，适配每一种 JavaScript 端', 'One Core API for every JavaScript runtime'),
+						description: t(
+							'通过 Provider 连接浏览器、Node、小程序等运行环境，并统一生命周期、取消、重试与共享请求。',
+							'Connect browsers, Node, mini programs and other runtimes through providers while sharing one lifecycle and control API.'
+						),
+						align: 'left',
+						accent,
+						accentSecondary,
+						background: '',
+						showVisual: true,
+						minHeight: 500,
+						highlights: [
+							{ value: 'Browser / Node', label: t('内置 Provider', 'Built-in providers') },
+							{ value: t('小程序', 'Mini programs'), label: t('自定义 Provider', 'Custom providers') },
+							{ value: 'Core API', label: t('各端一致', 'Consistent everywhere') }
+						],
+						actions: [action]
+					}, { ...stack, marginBottom: 64, fullWidth: true, maxWidth: 1200 }),
+
+					block('home-features', 'features', {
+						eyebrow: t('核心能力', 'Capabilities'),
+						title: t('请求流程中的每一环都可控制', 'Control every stage of a request'),
+						description: t(
+							'使用聚合包快速开始，或按需组合 Core、Provider 与 Hooks。',
+							'Start with the aggregate package or compose Core, providers and hooks as needed.'
+						),
+						columns: 3,
+						gap: 24,
+						items: cards([
+							{
+								title: t('多端一致', 'Consistent across runtimes'),
+								description: t('Browser、Node、小程序等端共享 HTTPController、请求选项与生命周期。', 'Browsers, Node, mini programs and other runtimes share HTTPController, request options and lifecycle hooks.'),
+								badge: t('统一', 'Unified'),
+								icon: 'link'
+							},
+							{
+								title: t('生命周期钩子', 'Lifecycle hooks'),
+								description: t('在请求前后改写数据，并用 pre/post 明确执行顺序。', 'Transform requests and responses with explicit pre/post ordering.'),
+								badge: t('可组合', 'Composable'),
+								icon: 'again'
+							},
+							{
+								title: t('可靠控制', 'Reliable control'),
+								description: t('内置取消、超时、重试、本地数据与相同请求共享。', 'Built-in cancellation, timeout, retries, local data and request sharing.'),
+								badge: t('稳定', 'Resilient'),
+								icon: 'upload'
+							}
+						])
+					}),
+
+					block('home-steps', 'steps', {
+						eyebrow: t('快速开始', 'Quick start'),
+						title: t('三步完成一次可控请求', 'A controlled request in three steps'),
+						description: t('安装、创建实例，然后发送或取消请求。', 'Install, create an instance, then send or cancel requests.'),
+						columns: 3,
+						items: cards([
+							{ title: t('安装', 'Install'), description: 'pnpm add @deot/http' },
+							{ title: t('配置', 'Configure'), description: t('通过 createInstance 设置公共选项与钩子。', 'Set shared options and hooks with createInstance.') },
+							{ title: t('请求', 'Request'), description: t('使用 http 直接发送，或用 custom 重复发送。', 'Send with http or reuse a request with custom.') }
+						])
+					}),
+
+					block('home-cta', 'cta', {
+						eyebrow: t('在线示例', 'Live examples'),
+						title: t('在 Playground 中直接运行', 'Run it in the Playground'),
+						description: t('文档示例使用本地模拟数据，无需依赖第三方接口。', 'Documentation examples use local mock data without third-party APIs.'),
+						align: 'center',
+						accent,
+						accentSecondary,
+						background: '',
+						actions: [action]
+					}, { ...stack, marginBottom: 0, fullWidth: true, maxWidth: 1200 })
+				]
+			};
+		};
+
+		const pathSegments = location.pathname.split('/');
+		const localeIndex = pathSegments.findIndex(segment => Boolean(locales[segment]));
+		const basePath = localeIndex >= 0
+			? `${pathSegments.slice(0, localeIndex).join('/')}/`
+			: location.pathname.endsWith('/')
+				? location.pathname
+				: new URL('./', location.href).pathname;
+		const logo = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l14 9M10 32h14M10 47l14-9M40 26l14-9M40 32h14M40 38l14 9"/></g><g fill="#14b8a6" stroke="#fff" stroke-width="2"><circle cx="10" cy="17" r="4"/><circle cx="10" cy="32" r="4"/><circle cx="10" cy="47" r="4"/><circle cx="54" cy="17" r="4"/><circle cx="54" cy="32" r="4"/><circle cx="54" cy="47" r="4"/></g><rect x="22" y="17" width="20" height="30" rx="8" fill="#fff" stroke="#2563eb" stroke-width="3"/><path d="M28 25h8M28 32h8M28 39h8" fill="none" stroke="#14b8a6" stroke-width="3" stroke-linecap="round"/></svg>')}`;
+		if (typeof document !== 'undefined') {
+			const favicon = document.createElement('link');
+			favicon.rel = 'icon';
+			favicon.type = 'image/svg+xml';
+			favicon.href = logo;
+			document.head.appendChild(favicon);
+		}
+
+		window.$docs = {
+			base: new URL(basePath, location.origin).href,
+			namespace: '@deot/http-site',
+			repository: 'https://github.com/deot/http',
+			theme: { default: 'system' },
+			layout: {
+				header: {
+					brand: {
+						logo,
+						label: '@deot/http',
+						value: '/'
+					}
+				}
+			},
+			locales,
+			routes: Object.fromEntries([
+				['/', {
+					content: {
+						'zh-CN': createHomeDocument('zh-CN'),
+						'en-US': createHomeDocument('en-US')
+					}
+				}],
+				...Object.keys(readmes).map(value => [`/packages/${value}`, {
+					value,
+					content: 'default',
+					sidebar: sidebars,
+					header: 'default',
+					footer: 'default',
+					extra: null
+				}]),
+				['*', '/packages/guide']
+			]),
+			resolve: {
+				markdown: ({ lang, value }) => (
+					localeReadmes[lang] || localeReadmes['zh-CN']
+				)[value],
+				resource: ({ source, runtime }) => {
+					if (source === 'README.md' || /^packages\/[^/]+\/README\.md$/.test(source)) {
+						return runtime.mode === 'development'
+							? `/${source}`
+							: new URL(source, repositoryRaw).href;
+					}
+					return undefined;
+				},
+				link: ({ href, lang, source }) => {
+					const logicalOrigin = 'https://docs.local';
+					let target;
+					try {
+						target = new URL(href, new URL(source, `${logicalOrigin}/`));
+					} catch {
+						return undefined;
+					}
+					if (target.origin !== logicalOrigin) return undefined;
+					const path = target.pathname.replace(/^\//, '');
+					const route = readmeRoutes[path];
+					if (route) return `/${lang}${route}${target.search}${target.hash}`;
+					return `${new URL(path, repositoryBlob).href}${target.search}${target.hash}`;
+				}
+			},
+			modules: {
+				'@deot/http': 'https://cdn.jsdelivr.net/npm/@deot/http@1.1.10/dist/index.browser.js',
+				'@deot/http-client': 'https://cdn.jsdelivr.net/npm/@deot/http-client@1.1.10/dist/index.js',
+				'@deot/http-core': 'https://cdn.jsdelivr.net/npm/@deot/http-core@1.1.7/dist/index.js',
+				'@deot/http-hooks': 'https://cdn.jsdelivr.net/npm/@deot/http-hooks@1.1.8/dist/index.js',
+				'@deot/http-shared': 'https://cdn.jsdelivr.net/npm/@deot/http-shared@1.1.1/dist/index.js',
+				'@deot/helper-is': 'https://cdn.jsdelivr.net/npm/@deot/helper-is@1.1.3/dist/index.js',
+				'@deot/helper-utils': 'https://cdn.jsdelivr.net/npm/@deot/helper-utils@1.1.8/dist/index.js'
+			},
+			styles: {}
+		};
+	</script>
+	<script type="module" src="https://cdn.jsdelivr.net/npm/@deot/docs-client/+esm"></script>
+</body>
+</html>
