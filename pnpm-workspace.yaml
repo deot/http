@@ -1,2 +1,17 @@
+shamefullyHoist: true
+
+linkWorkspacePackages: true
+
 packages:
   - 'packages/*'
+
+overrides:
+  "baseline-browser-mapping": "*"
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  canvas: true
+  esbuild: true
+  puppeteer: true
+  unrs-resolver: true

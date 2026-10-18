@@ -13,7 +13,7 @@ describe('fetch.ts', async () => {
 	const originalFetch = window.fetch;
 	// 让测试环境和真实浏览器环境一致(xhr.spec.ts是一致的)
 	window.fetch = (url: any, request: any) => {
-		if (request.body instanceof Blob || request.body?.get?.('files[]')) {
+		if (request.body instanceof Blob || request.body instanceof FormData || request.body?.get?.('files[]')) {
 			request.body = Data.string;
 		}
 

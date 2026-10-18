@@ -5,14 +5,14 @@
   "type": "module",
   "packageManager": "pnpm@latest",
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "init": "npx pnpm install",
     "init:force": "rm -rf ./node_modules pnpm-lock.yaml ./packages/*/node_modules && npm run init",
     "lint": "eslint . --color",
     "lint:fix": "npm run lint -- --fix",
     "link": "ddc link",
     "dev": "ddc dev",
-    "build": "ddc build --script-formats=es,cjs,umd,iife --node-package '@deot/http-server,@deot/http'",
+    "build": "ddc build --iife-package '*' --node-package '@deot/http-server,@deot/http'",
     "update": "ddc update",
     "test": "ddc test",
     "add": "ddc add",
@@ -39,6 +39,6 @@
   },
   "homepage": "https://github.com/deot/http#readme",
   "devDependencies": {
-    "@deot/dev": "^2.9.0"
+    "@deot/dev": "^2.10.0"
   }
 }
