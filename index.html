@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>@deot/http 文档</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta charset="UTF-8">
+</head>
+<body>
+	<div id="app"></div>
+	<script>
+		// 文档来源与导航
+		const repositoryRaw = 'https://raw.githubusercontent.com/deot/http/refs/heads/main/';
+		const repositoryBlob = 'https://github.com/deot/http/blob/main/';
+		const locales = {
+			'zh-CN': { label: '简体中文' },
+			'en-US': { label: 'English' }
+		};
+		const packageNames = ['index', 'core', 'client', 'server', 'hooks', 'shared'];
+		const readmeSources = { guide: 'README.md' };
+		const readmeRoutes = { 'README.md': '/packages/guide' };
+		for (const name of packageNames) {
+			const directory = `packages/${name}`;
+			const source = `${directory}/README.md`;
+			const route = `/${directory}`;
+			readmeSources[name] = source;
+			readmeRoutes[source] = route;
+			readmeRoutes[directory] = route;
+			readmeRoutes[`${directory}/`] = route;
+		}
+
+		const sidebars = {};
+		for (const lang of Object.keys(locales)) {
+			sidebars[lang] = [
+				{
+					label: lang === 'zh-CN' ? '简介' : 'Introduction',
+					value: '/packages/guide'
+				},
+				{
+					label: 'Packages',
+					children: packageNames.map(name => ({
+						label: name,
+						value: `/packages/${name}`
+					}))
+				}
+			];
+		}
+
+		const svgDataURL = source => `data:image/svg+xml,${encodeURIComponent(source)}`;
+
+		// 首页区块：介绍、核心能力、接入步骤、Provider 示例、使用约定、业务案例。
+		const createHomeDocument = (lang) => {
+			const t = (zh, en) => (lang === 'zh-CN' ? zh : en);
+			const featureColors = ['#c2410c', '#008060', '#2563eb', '#ca8a04', '#be185d', '#7c3aed'];
+			const createFeatureIcon = (paths, color) => svgDataURL([
+				'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"',
+				` stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">`,
+				paths,
+				'</svg>'
+			].join(''));
+			const quickStartAction = {
+				label: t('开始使用', 'Quick Start'),
+				to: `/${lang}/packages/guide`,
+				variant: 'solid',
+				size: 'large'
+			};
+			const sectionAppearance = {
+				marginTop: 0,
+				marginBottom: 64,
+				paddingTop: 0,
+				paddingBottom: 0,
+				maxWidth: 1536
+			};
+			const createBlock = (id, type, props, appearance = sectionAppearance) => ({
+				id,
+				module: { type, version: 1, props },
+				appearance
+			});
+			const createFeatureCards = items => items.map((item, index) => ({
+				...item,
+				icon: createFeatureIcon(item.icon, featureColors[index]),
+				accent: featureColors[index]
+			}));
+
+			const blocks = [
+				createBlock('home-hero', 'hero', {
+					eyebrow: '@deot/http',
+					title: t('一套请求 API，连接不同运行端', 'One request API. Across runtimes.'),
+					description: t(
+						[
+							'发送、取消、重试与共享，由 Core 统一管理。',
+							'浏览器 / Node 内置适配，小程序接入 Provider。',
+							'项目 Hook 集中处理鉴权、Loading 与业务错误。'
+						].join('\n'),
+						[
+							'Core handles send, cancel, retry and sharing.',
+							'Browser / Node built in; mini programs use Providers.',
+							'Project Hooks handle auth, loading and business errors.'
+						].join('\n')
+					),
+					align: 'left',
+					showVisual: true,
+					visual: {
+						type: 'code',
+						title: 'Network · TypeScript',
+						language: 'typescript',
+						content: [
+							"import { createInstance } from '@deot/http';",
+							'',
+							'const Network = createInstance({ timeout: 10_000 });',
+							"const response = await Network.http('https://api.example.com/users', {",
+							'  body: { page: 1 }',
+							'});',
+							'',
+							'console.log(response.status);',
+							"console.log(response.headers.get('content-type'));",
+							'console.log(response.body);'
+						].join('\n')
+					},
+					minHeight: 500,
+					highlights: [
+						{ value: 'Core', label: t('统一请求控制', 'Request control') },
+						{ value: 'Hook', label: t('组合业务策略', 'Application policies') },
+						{ value: 'Provider', label: t('连接平台传输', 'Platform transport') }
+					],
+					actions: [
+						quickStartAction,
+						{
+							...quickStartAction,
+							label: t('了解 Core', 'Explore Core'),
+							to: `/${lang}/packages/core`,
+							variant: 'outline'
+						}
+					]
+				}, { ...sectionAppearance, marginBottom: 40, fullWidth: true }),
+
+				createBlock('home-features', 'features', {
+					eyebrow: t('核心能力', 'Capabilities'),
+					title: t('多端接入，统一请求控制', 'Connect runtimes. Unify request control.'),
+					description: t(
+						'平台传输交给 Provider，请求控制交给 Core，数据转换与业务策略通过 Hook 组合。',
+						'Providers handle platform transports, Core controls requests, and hooks compose data transformations and application policies.'
+					),
+					align: 'center',
+					columns: 3,
+					gap: 24,
+					items: createFeatureCards([
+						{
+							title: t('Browser / Node 开箱即用', 'Browser / Node, ready to use'),
+							description: t(
+								'聚合包自动选择 Adapter：浏览器优先 Fetch，可选 XHR / JSONP；Node 使用 HTTP/HTTPS。也可单独安装 client 或 server。',
+								'The aggregate package selects an adapter: Fetch, XHR or JSONP in browsers, HTTP/HTTPS in Node. Install client or server separately when needed.'
+							),
+							badge: 'Adapter',
+							icon: [
+								'<rect x="2" y="4" width="20" height="14" rx="2"/>',
+								'<path d="M2 8h20M8 22h8M12 18v4M8 12l-2 2 2 2M16 12l2 2-2 2"/>'
+							].join('')
+						},
+						{
+							title: t('小程序与自定义运行端', 'Mini programs and custom runtimes'),
+							description: t(
+								'基于 Core 封装 uni.request、wx.request 等传输，统一返回 HTTPResponse，并接入底层取消能力。',
+								'Wrap uni.request, wx.request or another transport with Core. Return HTTPResponse and connect native cancellation.'
+							),
+							badge: 'Provider',
+							icon: [
+								'<rect x="7" y="3" width="10" height="18" rx="2"/>',
+								'<path d="M10 17h4M3 8l-2 4 2 4M21 8l2 4-2 4M10 6h4"/>'
+							].join('')
+						},
+						{
+							title: t('生命周期与业务策略', 'Lifecycle hooks and policies'),
+							description: t(
+								'异步 Hook 按顺序执行，在传输前后改写数据。通用 Hooks 提供编码与 JSON 解析，项目 Hook 集中处理鉴权、Loading 和业务状态。',
+								'Async hooks transform data in sequence around the transport. Shared hooks encode data and parse JSON; application hooks handle authentication, loading and business status.'
+							),
+							badge: 'Hook',
+							icon: [
+								'<path d="M4 6h16M4 12h16M4 18h16"/>',
+								'<circle cx="9" cy="6" r="2" fill="white"/>',
+								'<circle cx="15" cy="12" r="2" fill="white"/>',
+								'<circle cx="9" cy="18" r="2" fill="white"/>'
+							].join('')
+						},
+						{
+							title: t('取消与超时控制', 'Cancellation and timeouts'),
+							description: t(
+								'请求返回可 await 的 Leaf，可在执行中取消；timeout 限制 Core 等待时间。底层任务通过 Provider 对接 abort()。',
+								'Await a Leaf or cancel it while running. timeout bounds Core waiting, while providers connect abort() to the underlying task.'
+							),
+							badge: 'Control',
+							icon: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M6 19l-2 2M18 19l2 2"/>'
+						},
+						{
+							title: t('按次数与间隔重试', 'Retry with an attempt limit'),
+							description: t(
+								'maxTries 包含首次请求，interval 控制重试前等待。将业务失败转换为错误响应，即可复用同一套重试与 reject 流程。',
+								'maxTries includes the first attempt; interval waits before retries. Normalize business failures as error responses to reuse the retry and rejection flow.'
+							),
+							badge: 'Retry',
+							icon: '<path d="M20 7v5h-5M4 17v-5h5M6 6a8 8 0 0 1 13 3l1 3M4 12l1 3a8 8 0 0 0 13 3"/>'
+						},
+						{
+							title: t('重复发送与共享请求', 'Reusable and shared requests'),
+							description: t(
+								'custom().send() 复用请求定义；匹配的 shared key 与序列化配置复用同一 Leaf，成功结果保留到 removeShared() 或 clear()。',
+								'custom().send() reuses a request definition. Matching shared keys and serialized options reuse one Leaf, retaining successful results until removeShared() or clear().'
+							),
+							badge: 'Shared',
+							icon: [
+								'<rect x="2" y="8" width="6" height="8" rx="2"/>',
+								'<rect x="16" y="2" width="6" height="6" rx="2"/>',
+								'<rect x="16" y="16" width="6" height="6" rx="2"/>',
+								'<path d="M8 12h4l4-7M12 12l4 7"/>'
+							].join('')
+						}
+					])
+				}),
+
+				createBlock('home-steps', 'steps', {
+					eyebrow: t('快速开始', 'Quick start'),
+					title: t('三步发起第一个请求', 'Your first request in three steps'),
+					description: t(
+						'以 Browser / Node 聚合入口为例，先安装，再配置实例，最后发送并读取响应。',
+						'Start with the Browser / Node entry: install the package, configure an instance, then send a request and read the response.'
+					),
+					align: 'center',
+					columns: 3,
+					items: [
+						{
+							title: t('安装依赖', 'Install'),
+							description: t(
+								'运行 pnpm add @deot/http，使用内置的平台适配与通用数据转换。',
+								'Run pnpm add @deot/http to use the built-in adapters and shared data transformations.'
+							),
+							icon: '01',
+							accent: '#c2410c'
+						},
+						{
+							title: t('创建实例', 'Configure'),
+							description: t(
+								'导入 createInstance，通过 createInstance({ timeout: 10000 }) 设置公共选项，按需加入请求与响应 Hook。',
+								'Import createInstance and set shared options with createInstance({ timeout: 10000 }). Add request and response hooks as needed.'
+							),
+							icon: '02',
+							accent: '#0f766e'
+						},
+						{
+							title: t('发送并读取响应', 'Send and read'),
+							description: t(
+								'await Network.http(url) 得到 HTTPResponse，从 response.body 读取数据。替换为实际接口；Node 使用完整的 HTTP/HTTPS URL。',
+								'Await Network.http(url) for HTTPResponse, then read response.body. Use a real endpoint; Node requires a complete HTTP/HTTPS URL.'
+							),
+							icon: '03',
+							accent: '#4f46a5'
+						}
+					]
+				}),
+
+				createBlock('home-provider', 'code', {
+					eyebrow: t('扩展运行端', 'Connect a runtime'),
+					title: t('Provider 接住传输，Core 接管流程', 'A provider sends. Core controls.'),
+					description: t(
+						'自定义运行端先安装 pnpm add @deot/http-core。下面用本地响应展示 Provider 约定：接收标准化请求，返回 HTTPResponse；替换传输实现后，业务仍使用同一个 http()。',
+						'For a custom runtime, first run pnpm add @deot/http-core. This local provider accepts a normalized request and returns HTTPResponse. Replace the transport implementation while keeping the same http() API.'
+					),
+					filename: 'network.js',
+					language: 'javascript',
+					highlightLines: [4, 5, 7, 8],
+					content: [
+						"import { HTTPController, HTTPResponse } from '@deot/http-core';",
+						'',
+						'const Network = new HTTPController({',
+						'  onRequest(leaf) {',
+						"    leaf.request.headers.set('X-Source', 'docs');",
+						'  },',
+						'  provider: async (request) => new HTTPResponse({',
+						'    body: { url: request.url, method: request.method }',
+						'  })',
+						'});',
+						'',
+						"const response = await Network.http('/users');",
+						"console.log(response.body); // { url: '/users', method: 'GET' }"
+					].join('\n')
+				}),
+
+				createBlock('home-boundaries', 'faq', {
+					eyebrow: t('使用约定', 'Behavior to know'),
+					title: t('把控制行为说清楚', 'Know what each option does'),
+					items: [
+						{
+							question: t('Loading、Token 和业务失败由谁处理？', 'Who handles loading, tokens and business errors?'),
+							answer: t(
+								'这些是项目约定，由 Hook 或 Provider 读取扩展属性实现。HTTP 200 的业务失败，需要在 onResponse 中转换为 type: error，才能进入 Core 的重试与 reject 流程。',
+								'These are application policies implemented by hooks or providers. Convert a business failure inside HTTP 200 to type: error in onResponse so Core retries or rejects it.'
+							)
+						},
+						{
+							question: t('重试和共享会怎样执行？', 'How do retries and sharing work?'),
+							answer: t(
+								'maxTries 包含首次执行，interval 仅在重试前等待。shared 使用真值 key，并同时比较请求的 JSON 序列化结果；成功共享的 Leaf 会保留到 removeShared() 或 clear()。',
+								'maxTries includes the first attempt; interval waits only before retries. A truthy shared key and matching JSON-serialized requests reuse a Leaf. Successful shared Leafs remain until removeShared() or clear().'
+							)
+						},
+						{
+							question: t('开始、完成与取消作用在哪一层？', 'What do start, finish and cancellation control?'),
+							answer: t(
+								'onStart / onFinish 属于 Shell，一组并发 send() 各执行一次；真值 localData 跳过 Provider 和这两个阶段。Leaf 取消终止 Core 等待，底层网络任务的中止需要 Provider 接入。',
+								'onStart / onFinish run once for a Shell’s group of concurrent sends. Truthy localData skips the provider and these two hooks. Leaf cancellation ends Core waiting; aborting transport work requires provider support.'
+							)
+						}
+					]
+				}),
+
+				createBlock('home-cta', 'cta', {
+					eyebrow: t('业务接入', 'Application integration'),
+					title: t('从一次请求，到项目级 Network', 'From one request to an application Network'),
+					description: t(
+						'查看 Core 中的多文件业务案例：合并并发 Loading、注入身份信息、转换业务失败，并在最终重试失败后提示。示例 Provider 使用本地数据。',
+						'Explore the multi-file Core example: merge concurrent loading states, inject credentials, normalize business failures and report the final failed attempt with a local provider.'
+					),
+					align: 'center',
+					actions: [{
+						...quickStartAction,
+						label: t('查看业务封装', 'Explore the Network example'),
+						to: `/${lang}/packages/core#真实项目中的-network-封装`
+					}]
+				}, { ...sectionAppearance, marginBottom: 0, fullWidth: true })
+			];
+
+			return {
+				schemaVersion: 2,
+				meta: { id: `http-home-${lang}`, title: '@deot/http' },
+				layout: {
+					mode: 'sortable',
+					maxWidth: 1920,
+					minHeight: 600,
+					contentWidth: 1536,
+					sidePattern: true,
+					background: '#ffffff'
+				},
+				blocks
+			};
+		};
+
+		// 品牌图形：多个入口汇入统一处理节点，由一根线输出。
+		const logo = svgDataURL([
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">',
+			'<g fill="none" stroke="#c2410c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">',
+			'<path d="M10 17l14 9M10 32h14M10 47l14-9M42 32h16M52 26l6 6-6 6"/>',
+			'</g>',
+			'<g fill="#d97706" stroke="#fff" stroke-width="2">',
+			'<circle cx="10" cy="17" r="4"/>',
+			'<circle cx="10" cy="32" r="4"/>',
+			'<circle cx="10" cy="47" r="4"/>',
+			'</g>',
+			'<rect x="22" y="17" width="20" height="30" rx="8" fill="#fff" stroke="#c2410c" stroke-width="3"/>',
+			'<path d="M28 25h8M28 32h8M28 39h8" fill="none" stroke="#d97706" stroke-width="3" stroke-linecap="round"/>',
+			'</svg>'
+		].join(''));
+
+		// 站点路由与运行配置
+		const routes = {
+			'/': {
+				content: {
+					'zh-CN': createHomeDocument('zh-CN'),
+					'en-US': createHomeDocument('en-US')
+				}
+			}
+		};
+		for (const value of Object.keys(readmeSources)) {
+			routes[`/packages/${value}`] = {
+				value,
+				content: 'default',
+				sidebar: sidebars,
+				header: 'default',
+				footer: 'default',
+				extra: null
+			};
+		}
+		routes['*'] = '/packages/guide';
+
+		window.$docs = {
+			namespace: '@deot/http-site',
+			repository: 'https://github.com/deot/http',
+			theme: {
+				default: 'system',
+				colors: {
+					'color-primary': '#c2410c',
+					'color-secondary': '#d97706'
+				}
+			},
+			layout: {
+				header: {
+					brand: {
+						logo,
+						label: '@deot/http',
+						value: '/'
+					}
+				}
+			},
+			locales,
+			routes,
+			resolve: {
+				markdown: ({ value }) => readmeSources[value],
+				resource: ({ source, runtime }) => {
+					if (source === 'README.md' || /^packages\/[^/]+\/README\.md$/.test(source)) {
+						return runtime.mode === 'development'
+							? `/${source}`
+							: `${repositoryRaw}${source}`;
+					}
+					return undefined;
+				},
+				link: ({ href, lang, source }) => {
+					const logicalOrigin = 'https://docs.local';
+					let target;
+					try {
+						target = new URL(href, `${logicalOrigin}/${source.replace(/^\/+/, '')}`);
+					} catch {
+						return undefined;
+					}
+					if (target.origin !== logicalOrigin) return undefined;
+					const path = target.pathname.replace(/^\//, '');
+					const route = readmeRoutes[path];
+					if (route) return `/${lang}${route}${target.search}${target.hash}`;
+					return `${repositoryBlob}${path}${target.search}${target.hash}`;
+				}
+			},
+			modules: window.__DOCS_RUNTIME__?.mode !== 'development'
+				? {}
+				: {
+					// 与聚合包的 browser 入口一致，Playground 不加载 Node Provider。
+					'@deot/http': '/__docs/module/@deot/http-client',
+					'@deot/http-client': '/__docs/module/@deot/http-client',
+					'@deot/http-core': '/__docs/module/@deot/http-core',
+					'@deot/http-hooks': '/__docs/module/@deot/http-hooks',
+					'@deot/http-shared': '/__docs/module/@deot/http-shared'
+				},
+			styles: {}
+		};
+	</script>
+	<script>
+		const entries = [
+			'https://cdn.jsdelivr.net/npm/@deot/docs-launch/+esm',
+			'https://esm.unpkg.com/@deot/docs-launch/dist/index.js'
+		];
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), 15000);
+		const fail = () => {
+			document.querySelector('#app').textContent = '文档入口加载失败，请刷新重试。';
+		};
+		Promise.any(entries.map(async (src) => {
+			const response = await fetch(src, { signal: controller.signal });
+			if (!response.ok || !/(?:java|ecma)script/i.test(response.headers.get('content-type'))) {
+				throw new Error(`Invalid launch response: ${src}`);
+			}
+			return { cdn: src.match(/^https?:.*?(?=@deot\/docs-launch)/)?.[0], source: await response.text() };
+		})).finally(() => {
+			clearTimeout(timer);
+			controller.abort();
+		}).then(({ cdn, source }) => {
+			window.$docs.runtime = { mode: 'production', ...window.$docs.runtime, cdn };
+			document.body.appendChild(Object.assign(document.createElement('script'), { type: 'module', textContent: source, onerror: fail }));
+		}).catch(fail);
+	</script>
+</body>
+</html>
